@@ -1,0 +1,65 @@
+{% extends "core/base.html" %}
+{% block title %} Horario {% endblock %}
+{% load static %}
+{% block titulo %} Entrada / Salida {% endblock %}
+{% block breadcums %} 
+    <li class="breadcrumb-item"><a href="#">Horario</a></li>
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }}
+    </div>
+  {% endfor %}
+{% endif %}
+{% if marca == 'entrada' %}
+  <div class="alert alert-success alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h5><i class="icon fas fa-check"></i> Entrada!</h5>
+    {{ trabajador }} entro a las {{ hora|time:"h:i:s A" }}.
+  </div>
+{% elif marca == 'salida' %}
+  <div class="alert alert-success alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h5><i class="icon fas fa-check"></i> Salida!</h5>
+    {{ trabajador }} salio a las {{ hora|time:"h:i:s A" }}.
+  </div>
+{% elif marca == 'no' %}
+  <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        Persona no registrada o código invalido
+    </div>
+{% endif %}
+
+<div class="card">
+
+  {% comment %} <div class="card-header">
+    <h3 class="card-title">DataTable with default features</h3>
+  </div>  {% endcomment %}
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form method="post">{% csrf_token %}
+      {{ form }}
+      <br/>
+      <input type="submit" class="btn btn-outline-success float-right" value="Marcar">
+    </form>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+{% endblock %}

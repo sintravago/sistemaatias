@@ -1,0 +1,77 @@
+{% extends "core/base.html" %}
+{% block title %} Registro {% endblock %}
+{% load static %}
+{% block titulo %} Registro diario {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Trabajadores Clínica Atías</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombres y Apellidos</th>
+                                <th>Cargo</th>
+                                <th>Departamento</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hora in object_list %}
+                                <tr>
+                                    <td> {{ hora.trabajador.cedula}} </td>
+                                    <td>{{ hora.trabajador.nombre}} {{ trabajador.apellido}}</td>
+                                    <td>{{ hora.trabajador.cargo}}</td>
+                                    <td>{{ hora.trabajador.departamento}}</td>
+                                    <td>{{ hora.entrada|time:"h:i A" }} </td>
+                                    <td> {{ hora.salida|time:"h:i A" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombres y Apellidos</th>
+                                <th>Cargo</th>
+                                <th>Departamento</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+              <!-- /.card-body -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script>
+    $(function () {
+        $("#example1").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+        });
+    });
+</script>
+{% endblock %}

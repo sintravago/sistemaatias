@@ -1,0 +1,47 @@
+{% extends "registration/base.html" %}
+{% block title %} Actualizar Email {% endblock %}
+{% load static %}
+{% block content %}
+{% comment %} <style>.errorlist{color:red;} label{display:none}</style>
+<main role="main">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-md-9 mx-auto mb-5">
+        <form action="" method="post">{% csrf_token %}
+          <h3 class="mb-4">Email</h3>
+          {{form}}
+          <p><input type="submit" class="btn btn-primary btn-block" value="Actualizar"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</main> {% endcomment %}
+<div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">
+      Estás a solo un paso de tu nuevo email, cambia tu email ahora.</p>
+      <form action="" method="post">{% csrf_token %}
+        {% if form.email.errors %}
+          <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h5><i class="icon fas fa-exclamation-triangle"></i> Alerta!</h5>
+            {{form.email.errors}}
+          </div>
+        {% endif %}
+        <label for="id_email">Email:</label>
+        <div class="input-group mb-3">
+          <input type="email" name="email" value="{{ request.user.email }}" class="form-control" placeholder="Email" required="" id="id_email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">Cambiar Email</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+{% endblock %}

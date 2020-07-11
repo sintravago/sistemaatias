@@ -1,0 +1,71 @@
+{% extends "registration/base.html" %}
+{% block title %} Iniciar Sesión {% endblock %}
+{% load static %}
+{% block content %}
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Inicia sesión para continuar</p>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          <h5><i class="icon fas fa-ban"></i> Error!</h5>
+          Usuario o contraseña incorrectos, prueba de nuevo.
+        </div>
+      {% endif %}
+      <form action="" method="post">{% csrf_token %}
+        <div class="input-group mb-3">
+          <input name="username" autofocus id="id_username" type="text" class="form-control" placeholder="Nombre de usuario">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" name="password" required id="id_password" class="form-control" placeholder="Contraseña">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+            <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember">
+                Recuérdame
+              </label>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+      {% comment %} <div class="social-auth-links text-center mb-3">
+        <p>- OR -</p>
+        <a href="#" class="btn btn-block btn-primary">
+          <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+        </a>
+        <a href="#" class="btn btn-block btn-danger">
+          <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+        </a>
+      </div> {% endcomment %}
+      <!-- /.social-auth-links -->
+
+      <p class="mb-1">
+        <a href="forgot-password.html">Olvidé mi contraseña</a>
+      </p>  
+      {% comment %} <p class="mb-0">
+        <a href="register.html" class="text-center">Si eres ingeniero regístrate</a>
+      </p> {% endcomment %}
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+{% endblock %}
+<!-- /.login-box -->
