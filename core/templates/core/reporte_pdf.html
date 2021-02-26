@@ -1,0 +1,171 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <style type="text/css">
+            body {
+                font-family: "Helvetica", "sans-serif";
+                color: #333333;
+            }
+            .sello{
+                border: 2.5px solid #3C3A3A;
+                padding-top: 5px;
+                font-family: Georgia;
+                font-size: 14px;
+                color: #3C3A3A;
+            }
+            .tsello{
+                font-size: 19px;
+            }
+            .bordes{
+                border: 0.2px solid rgba(34,36,38,.15);
+                padding-top: 3px;
+                padding-left: 1px;
+            }
+            .bordes thead th{
+                background-color: gainsboro;
+                text-align: left;
+            }
+            .bordes thead td{
+                text-align: center;
+            }
+            .centrar tbody td{
+                text-align: center;
+            }
+            .bordes tfoot th{
+                background-color: gainsboro;
+                text-align: right;
+                padding-right:2px;
+            }
+            .firmas{
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Departamento: {{ departamento }}</th>
+                    <th>Fecha: {{ fecha }}</th>
+                </tr>
+            </thead>
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>   
+                    <th colspan='7'>Entrada - Salida</th>
+                </tr>
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombres y Apellidos</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>tipo</th>
+                    <th>fecha</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hora in object_list %}
+                    <tr>
+                        <td> {{ hora.trabajador.get_profile.cedula}} </td>
+                        <td>{{ hora.trabajador.first_name}} {{ hora.trabajador.last_name}}</td>
+                        <td>{{ hora.trabajador.get_profile.cargo}}</td>
+                        <td>{{ hora.trabajador.get_profile.departamento}}</td>
+                        <td>{{ hora.get_tipo_display }}</td>
+                        <td> {{ hora.fecha|date:"d/m/Y" }}</td>
+                        <td> {{ hora.fecha|date:"P" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>   
+                    <th colspan='5'>Horas Trabajadas</th>
+                </tr>
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombres y Apellidos</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Horas T.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hora in trabajadores %}
+                    <tr>
+                        <td> {{ hora.trabajador.cedula}} </td>
+                        <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
+                        <td>{{ hora.trabajador.cargo}}</td>
+                        <td>{{ hora.trabajador.departamento}}</td>
+                        <td>{% if hora.horas < 10 %}0{% endif %}{{ hora.horas }}:{% if hora.minutos < 10 %}0{% endif %}{{ hora.minutos }}:{% if hora.segundos < 10 %}0{% endif %}{{ hora.segundos }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>   
+                    <th colspan='5'>Guardias</th>
+                </tr>
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombres y Apellidos</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Horas G.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hora in trabajadores %}
+                    {% if hora.gt > 0 %}
+                        <tr>
+                            <td> {{ hora.trabajador.cedula}} </td>
+                            <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
+                            <td>{{ hora.trabajador.cargo}}</td>
+                            <td>{{ hora.trabajador.departamento}}</td>
+                            <td>{% if hora.horasg < 10 %}0{% endif %}{{ hora.horasg }}:{% if hora.minutosg < 10 %}0{% endif %}{{ hora.minutosg }}:{% if hora.segundosg < 10 %}0{% endif %}{{ hora.segundosg }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>   
+                    <th colspan='7'>Permisos</th>
+                </tr>
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombres y Apellidos</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Motivo</th>
+                    <th>Observación</th>
+                    <th>fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for permiso in permisos %}
+                    {% if hora.gt > 0 %}
+                        <tr>
+                            <td> {{ permiso.trabajador.cedula}} </td>
+                            <td>{{ permiso.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
+                            <td>{{ permiso.trabajador.cargo}}</td>
+                            <td>{{ permiso.trabajador.departamento}}</td>
+                            <td>{{ permiso.get_motivo_display }}</td>
+                            <td>{{ permiso.Observacion }}</td>
+                            <td>{{ permiso.desde|date:"d/m/Y P" }} - {{ permiso.hasta|date:"d/m/Y P"}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

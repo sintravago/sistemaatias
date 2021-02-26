@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from registration.models import departamento
 # Create your models here.
 
 def user_directory_path(instance, filename):
@@ -51,3 +51,16 @@ class marca(models.Model):
 
     class Meta:
         ordering = ['-pk']
+
+class visitantes(models.Model):
+    tipo_marca = [
+        ('E', 'Entrada'),
+        ('S', 'Salida'),
+    ]
+
+    nombre = models.CharField(max_length=150 , verbose_name='Nombre')
+    cedula = models.IntegerField(verbose_name='Cédula')
+    fecha = models.DateTimeField(auto_now_add=True, verbose_name='fecha')
+    tipo = models.CharField(max_length=1, choices=tipo_marca, default='E')
+    observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
+    departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.CASCADE)

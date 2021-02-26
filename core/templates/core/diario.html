@@ -54,6 +54,8 @@
                     </div>
                 </div>
                 <input type="submit" class="btn btn-outline-success float-right" value="Buscar">
+                <a class="btn btn-outline-info" href = "{% url "core:pdf" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> PDF </a>
+                <a class="btn btn-outline-info" href = "{% url "core:excel" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> Excel </a>
             </form>
         </div>
         <!-- /.card-header -->
@@ -176,7 +178,7 @@
                         <th>Cargo</th>
                         <th>Departamento</th>
                         <th>Motivo</th>
-                        <th>Observacion</th>
+                        <th>Observación</th>
                         <th>fecha</th>
                     </tr>
                 </thead>

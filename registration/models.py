@@ -30,6 +30,11 @@ class Profile(models.Model):
         ('F', 'Femenino'),
     ]
 
+    choise_estatus = [
+        ('A', 'Activo'),
+        ('I', 'Inactivo'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="get_profile")
     codigo = models.IntegerField(verbose_name='Código', null=True, blank=True)
     cedula = models.IntegerField(verbose_name='Cédula')
@@ -40,7 +45,7 @@ class Profile(models.Model):
     tlf1 = models.CharField(max_length=50 , verbose_name='Teléfono 1', null = True, blank = True)
     tlf2 = models.CharField(max_length=50 , verbose_name='Teléfono 2', null = True, blank = True)
     horario = models.ForeignKey(horario, verbose_name="Horario", on_delete=models.CASCADE)
-
+    estatus = models.CharField(max_length=1, choices=choise_estatus, default='A',)
     def __str__(self):
         return (self.user.first_name + ' ' + self.user.last_name)
 

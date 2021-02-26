@@ -254,18 +254,18 @@
               <a href="{% url 'core:diario' %}" class="nav-link {% if 'diario' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <p>
-                  Marcaje
+                  Reportes
                 </p>
               </a>
             </li>
-            <li class="nav-item">
+            {% comment %} <li class="nav-item">
               <a href="{% url 'core:fecha' %}" class="nav-link {% if 'fecha' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>
                   Resumen
                 </p>
               </a>
-            </li>
+            </li> {% endcomment %}
           {% endif %}
         </ul>
       </nav>

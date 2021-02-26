@@ -67,8 +67,11 @@
     <form method="post">{% csrf_token %}
       {{ form }}
       <br/>
-      <input type="submit" class="btn btn-outline-success float-right" name="entrada" id="entrada" value="Entrada">
-      <input type="submit" class="btn btn-outline-success float-right" name="Salida" id="Salida" value="Salida">
+      <div class="btn-group float-right">
+        
+        <input type="submit" class="btn btn-outline-info " name="Salida" id="Salida" value="Salida">
+        <input type="submit" class="btn btn-outline-success " name="entrada" id="entrada" value="Entrada">
+      </div>
     </form>
   </div>
   <!-- /.card-body -->
