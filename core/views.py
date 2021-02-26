@@ -1,45 +1,48 @@
 from django.shortcuts import render
-from .forms import HorarioAddForm
-from .models import Trabajador, horas
+from .forms import MarcarForm
+from registration.models import Profile, horario
+from .models import marca
 from datetime import datetime
 from django.views.generic.list import ListView
+from django.views.generic.edit import FormView
 from django.db.models import Avg, Count, Min, Sum
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 # Create your views here.
 
 def marcar(request):
-    form = HorarioAddForm()
+    form = MarcarForm()
     if request.method == 'POST':
-        form = HorarioAddForm(request.POST)
+        form = MarcarForm(request.POST)
         if form.is_valid():
-            if (Trabajador.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
-                t = Trabajador.objects.get(cedula=form.cleaned_data['barcode'])
-                hoy = datetime.now()
-                hoy_fecha = hoy.strftime("%Y-%m-%d")
-                if (horas.objects.filter(trabajador = t, fecha = hoy_fecha).exists()):
-                    registro = horas.objects.get(trabajador = t, fecha = hoy_fecha)
-                    hoy_hora = hoy.strftime("%H:%M:%S")
-                    registro.salida = hoy_hora
-                    registro.save()
-                    return render(request,'core/marcar.html',{'form':form, 'trabajador':t, 'marca':'salida', 'hora':hoy})
+            if (Profile.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
+                trabajador = Profile.objects.get(cedula=form.cleaned_data['barcode'])
+                if 'entrada' in request.POST:
+                    e = "E"
                 else:
-                    registro = horas.objects.create(trabajador = t)
-                    return render(request,'core/marcar.html',{'form':form, 'trabajador':t, 'marca':'entrada', 'hora':registro.entrada})
+                    e = "S"
+                if marca.objects.filter(trabajador=trabajador.user).exists():
+                    ultima = marca.objects.filter(trabajador=trabajador.user).first()
+                    if ultima.tipo == e:
+                        return render(request,'core/marcar.html',{'form':form, 'marca':'ya', 'e': e})
+                m = marca(trabajador=trabajador.user, tipo=e)
+                m.save()
+                return render(request,'core/marcar.html',{'form':form, 'trabajador':trabajador, 'marca':e, 'hora':m.fecha})
             else:
                 return render(request,'core/marcar.html',{'form':form, 'marca':'no'})
     return render(request,'core/marcar.html',{'form':form})
 
 @method_decorator(login_required, name='dispatch')
 class TrabajadoresListView(ListView):
-    model = Trabajador
+    model = Profile
     template_name = 'core/trabajadores.html'
 
 @method_decorator(login_required, name='dispatch')
 class HoyListView(ListView):
     hoy = datetime.now()
     hoy_fecha = hoy.strftime("%Y-%m-%d")
-    queryset = horas.objects.filter(fecha = hoy_fecha)
+    queryset = marca.objects.filter(fecha = hoy_fecha)
     template_name = 'core/hoy.html'
 
 @login_required
@@ -47,11 +50,11 @@ def diarioView(request):
     if request.POST:
         fecha = request.POST['date']
         fecha_f = datetime.strptime(fecha, '%d/%m/%Y')
-        result = horas.objects.filter(fecha = fecha_f.strftime('%Y-%m-%d'))
+        result = marca.objects.filter(fecha = fecha_f.strftime('%Y-%m-%d'))
     else:
         hoy = datetime.now()
         hoy_fecha = hoy.strftime("%Y-%m-%d")
-        result = horas.objects.filter(fecha = hoy_fecha)
+        result = marca.objects.filter(fecha = hoy_fecha)
     return render(request,'core/diario.html',{'object_list':result})
 
 @login_required        
@@ -63,9 +66,9 @@ def fechaView(request):
         fin = fin.strip(' ')
         inicio_f = datetime.strptime(inicio, '%d/%m/%Y')
         fin_f = datetime.strptime(fin, '%d/%m/%Y')
-        result = horas.objects.filter(fecha__gte=inicio_f.strftime('%Y-%m-%d'),fecha__lte=fin_f.strftime('%Y-%m-%d')).order_by('trabajador')
+        result = marca.objects.filter(fecha__gte=inicio_f.strftime('%Y-%m-%d'),fecha__lte=fin_f.strftime('%Y-%m-%d')).order_by('trabajador')
     else:
-        result = horas.objects.all().order_by('trabajador')
+        result = marca.objects.all().order_by('trabajador')
     trabajadores = []
     trabajador = {}
     for hora in result:

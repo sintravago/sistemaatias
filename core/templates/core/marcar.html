@@ -25,13 +25,13 @@
     </div>
   {% endfor %}
 {% endif %}
-{% if marca == 'entrada' %}
+{% if marca == 'E' %}
   <div class="alert alert-success alert-dismissible">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     <h5><i class="icon fas fa-check"></i> Entrada!</h5>
     {{ trabajador }} entro a las {{ hora|time:"h:i:s A" }}.
   </div>
-{% elif marca == 'salida' %}
+{% elif marca == 'S' %}
   <div class="alert alert-success alert-dismissible">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     <h5><i class="icon fas fa-check"></i> Salida!</h5>
@@ -42,6 +42,12 @@
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
       <h5><i class="icon fas fa-ban"></i> Error!</h5>
         Persona no registrada o código invalido
+    </div>
+{% elif marca == 'ya' %}
+  <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        Persona ya marco {% if e == "E" %} entrada {% else %} salida {% endif %}
     </div>
 {% endif %}
 
@@ -55,7 +61,8 @@
     <form method="post">{% csrf_token %}
       {{ form }}
       <br/>
-      <input type="submit" class="btn btn-outline-success float-right" value="Marcar">
+      <input type="submit" class="btn btn-outline-success float-right" name="entrada" id="entrada" value="Entrada">
+      <input type="submit" class="btn btn-outline-success float-right" name="Salida" id="Salida" value="Salida">
     </form>
   </div>
   <!-- /.card-body -->

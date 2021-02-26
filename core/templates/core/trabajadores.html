@@ -23,6 +23,7 @@
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                <th>Codigo</th>
                                 <th>Cédula</th>
                                 <th>Nombres y Apellidos</th>
                                 <th>Cargo</th>
@@ -33,11 +34,12 @@
                         <tbody>
                             {% for trabajador in object_list %}
                                 <tr>
+                                    <td> {{ trabajador.codigo}} </td>
                                     <td> {{ trabajador.cedula}} </td>
-                                    <td>{{ trabajador.nombre}} {{ trabajador.apellido}}</td>
+                                    <td>{{ trabajador.user.first_name}} {{ trabajador.user.last}}</td>
                                     <td>{{ trabajador.cargo}}</td>
                                     <td>{{ trabajador.departamento}}</td>
-                                    <td>{{ trabajador.entrada|time:"h:i A" }} - {{ trabajador.salida|time:"h:i A" }}</td>
+                                    <td>{{ trabajador.horario}}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
