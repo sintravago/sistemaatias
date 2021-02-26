@@ -9,20 +9,37 @@
 
   <!-- daterange picker -->
   <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'core/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}">
 {% endblock %}
 {% block breadcums %} 
     
 {% endblock %}
 
 {% block contenido %}
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <form method="post">{% csrf_token %}
+    <div class="card">
+        <div class="card-header">
+            <form method="post">{% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label>Departamento</label>
+                            <select class="select2bs4" name="departamento" id="departamento" required>
+                            <option value = "0">Todos</option>
+                            {% for dep in departamento %}
+                                <option value = {{dep.pk}} {% if dep.id|floatformat == request.POST.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
                         <div class="form-group">
                             <label>Rango de fecha a consultar:</label>
-
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                 <span class="input-group-text">
@@ -33,47 +50,47 @@
                             </div>
                             <!-- /.input group -->
                         </div>
-                        <input type="submit" class="btn btn-outline-success float-right" value="Buscar">
-                    </form>
-                    
+                    </div>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <table id="example1" class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Cédula</th>
-                                <th>Nombres y Apellidos</th>
-                                <th>Cargo</th>
-                                <th>Departamento</th>
-                                <th>Horas T.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for hora in trabajadores %}
-                                <tr>
-                                    <td> {{ hora.trabajador.cedula}} </td>
-                                    <td>{{ hora.trabajador.nombre}} {{ trabajador.apellido}}</td>
-                                    <td>{{ hora.trabajador.cargo}}</td>
-                                    <td>{{ hora.trabajador.departamento}}</td>
-                                    <td> {{ hora.horas }}:{{ hora.minutos }}:{{ hora.segundos }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Cédula</th>
-                                <th>Nombres y Apellidos</th>
-                                <th>Cargo</th>
-                                <th>Departamento</th>
-                                <th>Horas T.</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-              <!-- /.card-body -->
-            </div>
+                <input type="submit" class="btn btn-outline-success float-right" value="Buscar">
+            </form>
+            
         </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Cargo</th>
+                        <th>Departamento</th>
+                        <th>Horas R.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hora in trabajadores %}
+                        <tr>
+                            <td> {{ hora.trabajador.cedula}} </td>
+                            <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
+                            <td>{{ hora.trabajador.cargo}}</td>
+                            <td>{{ hora.trabajador.departamento}}</td>
+                            <td>{% if hora.horas < 10 %}0{% endif %}{{ hora.horas }}:{% if hora.minutos < 10 %}0{% endif %}{{ hora.minutos }}:{% if hora.segundos < 10 %}0{% endif %}{{ hora.segundos }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Cargo</th>
+                        <th>Departamento</th>
+                        <th>Horas R.</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /.card-body -->
     </div>
 {% endblock %}
 
@@ -90,6 +107,11 @@
 
 <script>
     $(function () {
+
+        $('.select2bs4').select2({
+          theme: 'bootstrap4'
+        })
+
         $("#example1").DataTable({
         "responsive": true,
         "autoWidth": false,

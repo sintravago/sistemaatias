@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .forms import MarcarForm
-from registration.models import Profile, horario
-from .models import marca
+from registration.models import Profile, horario, departamento
+from .models import marca, guardia, permisos
 from datetime import datetime
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
@@ -17,6 +17,7 @@ def marcar(request):
         form = MarcarForm(request.POST)
         if form.is_valid():
             if (Profile.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
+
                 trabajador = Profile.objects.get(cedula=form.cleaned_data['barcode'])
                 if 'entrada' in request.POST:
                     e = "E"
@@ -26,6 +27,8 @@ def marcar(request):
                     ultima = marca.objects.filter(trabajador=trabajador.user).first()
                     if ultima.tipo == e:
                         return render(request,'core/marcar.html',{'form':form, 'marca':'ya', 'e': e})
+                elif e == "S":
+                    return render(request,'core/marcar.html',{'form':form, 'marca':'p'})
                 m = marca(trabajador=trabajador.user, tipo=e)
                 m.save()
                 return render(request,'core/marcar.html',{'form':form, 'trabajador':trabajador, 'marca':e, 'hora':m.fecha})
@@ -47,52 +50,96 @@ class HoyListView(ListView):
 
 @login_required
 def diarioView(request):
+    dep = departamento.objects.all()
+    trabajadores = Profile.objects.all()
+    list_t = {}
+    list_tt = []
     if request.POST:
-        fecha = request.POST['date']
-        fecha_f = datetime.strptime(fecha, '%d/%m/%Y')
-        result = marca.objects.filter(fecha = fecha_f.strftime('%Y-%m-%d'))
+        desde, hasta = request.POST['reservation'].split('-')
+        desde = desde.strip(' ')
+        hasta = hasta.strip(' ')
+        desde = datetime.strptime(desde, '%d/%m/%Y')
+        hasta = datetime.strptime(hasta, '%d/%m/%Y')
+        p = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d 00:00:00'), hasta__lte = hasta.strftime('%Y-%m-%d 23:59:59') )
+        result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        if request.POST['departamento'] != "0":
+            result = result.filter(trabajador__get_profile__departamento = request.POST['departamento'])
     else:
         hoy = datetime.now()
-        hoy_fecha = hoy.strftime("%Y-%m-%d")
-        result = marca.objects.filter(fecha = hoy_fecha)
-    return render(request,'core/diario.html',{'object_list':result})
+        desde = hoy.strftime("%Y-%m-%d 00:00:00")
+        hasta = hoy.strftime("%Y-%m-%d 23:59:59")
+        result = marca.objects.filter(fecha__gte = desde,fecha__lte = hasta)
+        p = permisos.objects.filter(desde__gte = desde, hasta__lte = hasta )
+    
+    
+    for trabajador in trabajadores:
+        if result.filter(trabajador = trabajador.user).exists():
+            results = result.filter(trabajador = trabajador.user)
+            tiene_g = False
+            if guardia.objects.filter(trabajador=trabajador.user).exists():
+                g = guardia.objects.filter(trabajador=trabajador.user)
+                tiene_g = True
+            total = results.count()
+            if total > 1:
+                if total % 2 != 0:
+                    total -= 1
+                i = 0
+                tiempo = 0
+                gt = 0
+                while(i < total):
+                    if tiene_g:
+                        if g.count() > 0:
+                            for j in g:
+                                if j.entrada.date() == results[i+1].fecha.date():
+                                    gt += (results[i].fecha - results[i+1].fecha).total_seconds()
+                    tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
+                    i += 2
+                tiempo -= gt
+                list_t['tiempo'] = tiempo
+                list_t['trabajador'] = trabajador
+                list_t['horas'] = int(tiempo // 3600)
+                list_t['segundos'] = int(tiempo % 3600)
+                list_t['minutos'] = int(list_t['segundos'] // 60)
+                list_t['segundos'] = int(list_t['segundos'] % 60)
+                list_t['gt'] = gt
+                list_t['horasg'] = int(gt // 3600)
+                list_t['segundosg'] = int(gt % 3600)
+                list_t['minutosg'] = int(list_t['segundosg'] // 60)
+                list_t['segundosg'] = int(list_t['segundosg'] % 60)
+                list_tt.append(list_t.copy())
+    return render(request,'core/diario.html',{'object_list':result,'departamento':dep,'trabajadores':list_tt, 'permisos':p})
 
 @login_required        
 def fechaView(request):
-    if request.POST:
-        # result = horas.objects.filter(fecha=request.POST['reservation']).order_by('trabajador')
-        inicio, fin = request.POST['reservation'].split('-')
-        inicio = inicio.strip(' ')
-        fin = fin.strip(' ')
-        inicio_f = datetime.strptime(inicio, '%d/%m/%Y')
-        fin_f = datetime.strptime(fin, '%d/%m/%Y')
-        result = marca.objects.filter(fecha__gte=inicio_f.strftime('%Y-%m-%d'),fecha__lte=fin_f.strftime('%Y-%m-%d')).order_by('trabajador')
-    else:
-        result = marca.objects.all().order_by('trabajador')
-    trabajadores = []
-    trabajador = {}
-    for hora in result:
-        if len(trabajadores) == 0 or trabajadores[-1]['trabajador'] != hora.trabajador:
-            trabajador['trabajador'] = hora.trabajador
-            if hora.salida:
-                trabajador['total'] = (hora.salida.hour * 3600 + hora.salida.minute * 60 + hora.salida.second) - (hora.entrada.hour * 3600 + hora.entrada.minute * 60 + hora.entrada.second)
-            else:
-                trabajador['total'] = 0
-            trabajador['minutos'] = int(trabajador['total'] / 60)
-            trabajador['segundos'] = int(trabajador['total'] % 60)
-            trabajador['horas'] = int(trabajador['minutos'] / 60)
-            trabajador['minutos'] = int(trabajador['minutos'] % 60)
-            trabajadores.append(trabajador.copy())
-        else:
-            if hora.salida:
-                trabajadores[-1]['total'] += (hora.salida.hour * 3600 + hora.salida.minute * 60 + hora.salida.second) - (hora.entrada.hour * 3600 + hora.entrada.minute * 60 + hora.entrada.second)
-                trabajadores[-1]['minutos'] = int(trabajadores[-1]['total'] / 60)
-                trabajadores[-1]['segundos'] = int(trabajadores[-1]['total'] % 60)
-                trabajadores[-1]['horas'] = int(trabajadores[-1]['minutos'] / 60)
-                trabajadores[-1]['minutos'] = int(trabajadores[-1]['minutos'] % 60)
-    return render(request,'core/fecha.html',{'trabajadores':trabajadores})
+    trabajadores = Profile.objects.all()
+    dep = departamento.objects.all()
+    list_t = {}
+    list_tt = []
+    for trabajador in trabajadores:
+        if marca.objects.filter(trabajador = trabajador.user).exists():
+            results = marca.objects.filter(trabajador = trabajador.user)
+            if request.POST:
+                desde, hasta = request.POST['reservation'].split('-')
+                desde = desde.strip(' ')
+                hasta = hasta.strip(' ')
+                desde = datetime.strptime(desde, '%d/%m/%Y')
+                hasta = datetime.strptime(hasta, '%d/%m/%Y')
+                results = results.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+            total = results.count()
+            if total > 1:
+                if total % 2 != 0:
+                    total -= 1
+                i = 0
+                tiempo = 0
+                extra = 0
+                while(i < total):
+                    tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
+                    i += 2
+                list_t['trabajador'] = trabajador
+                list_t['horas'] = int(tiempo // 3600)
+                list_t['segundos'] = int(tiempo % 3600)
+                list_t['minutos'] = int(list_t['segundos'] // 60)
+                list_t['segundos'] = int(list_t['segundos'] % 60)
+                list_tt.append(list_t.copy())
 
-            
-        
-        
-        
+    return render(request,'core/fecha.html',{'trabajadores':list_tt,'departamento':dep})

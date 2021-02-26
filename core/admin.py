@@ -6,10 +6,10 @@ class permisosAdmin(admin.ModelAdmin):
     list_display = ('desde','hasta','trabajador','motivo')
 
 class marcaAdmin(admin.ModelAdmin):
-    list_display = ('fecha','tipo','trabajador')
+    list_display = ('fecha','tipo','modo','trabajador')
 
 class guardiaAdmin(admin.ModelAdmin):
-    list_display = ('trabajador','entrada','salida','fecha')
+    list_display = ('trabajador','entrada','salida')
 
 admin.site.register(guardia, guardiaAdmin)
 admin.site.register(marca, marcaAdmin)

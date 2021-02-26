@@ -23,9 +23,9 @@ class permisos(models.Model):
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.CASCADE, related_name="get_usuario")
 
 class guardia(models.Model):
-    entrada = models.TimeField()
-    salida = models.TimeField()
-    fecha = models.DateField()
+    entrada = models.DateTimeField()
+    salida = models.DateTimeField()
+    observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.CASCADE)
     
     def __str__(self):
@@ -37,12 +37,13 @@ class marca(models.Model):
         ('S', 'Salida'),
     ]
     modo_marca = [
-        (1, 'Regular'),
-        (2, 'Guardia'),
+        ('R', 'Regular'),
+        ('G', 'Guardia'),
     ]
     fecha = models.DateTimeField(auto_now_add=True, verbose_name='fecha')
     tipo = models.CharField(max_length=1, choices=tipo_marca, default='E')
-    modo = models.CharField(max_length=1, choices=tipo_marca, default=1)
+    modo = models.CharField(max_length=1, choices=modo_marca, default='R')
+    observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.CASCADE)
 
     def __str__(self):
