@@ -29,6 +29,10 @@
   <link rel="stylesheet" href="{% static 'core/plugins/summernote/summernote-bs4.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'core/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
   {% block head %} 
 
   {% endblock %}
@@ -241,12 +245,44 @@
               </p>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="{% url 'core:visitantes_add' %}" class="nav-link {% if "visitantes" in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-edit"></i>
+              <p>
+                Visitantes
+              </p>
+            </a>
+          </li>
           {% if request.user.is_authenticated %}
             <li class="nav-item">
               <a href="{% url 'core:trabajadores' %}" class="nav-link {% if 'trabajadores' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-users"></i>
                 <p>
                   Trabajadores
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'core:visitas' %}" class="nav-link {% if 'visitas' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-users"></i>
+                <p>
+                  Visitas
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'core:permisos_add' %}" class="nav-link {% if 'permisos' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-users"></i>
+                <p>
+                  Registrar Permiso
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'core:extras_add' %}" class="nav-link {% if 'extras' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <p>
+                  Horas extras
                 </p>
               </a>
             </li>
@@ -357,6 +393,8 @@
 <!-- JQVMap -->
 <script src="{% static 'core/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
 <script src="{% static 'core/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static 'core/plugins/select2/js/select2.full.min.js' %}"></script>
 {% block script %}
  {% endblock %}
 </body>

@@ -9,7 +9,11 @@ core_patterns = ([
     path('reportexcel/', views.exportarhora, name ='excel'),
     path('reporte/diario/', views.diarioView, name ='diario'),
     path('reporte/fecha', views.fechaView, name ='fecha'),
-    
+    path('visitantes', views.visitantes_add, name ='visitantes_add'),
+    path('permisos/add', views.PermisosCreateView.as_view(), name ='permisos_add'),
+    path('extras/add', views.ExtraCreateView.as_view(), name ='extras_add'),
+    path('visitas', views.VisitasListView.as_view(), name ='visitas'),
+
 ], 'core')
 
 urlpatterns = [

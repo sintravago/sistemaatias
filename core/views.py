@@ -1,14 +1,14 @@
 from django.shortcuts import render
-from .forms import MarcarForm
+from .forms import MarcarForm, VisitarntesForm, PermisosForm, ExtrasForm
 from registration.models import Profile, horario, departamento
-from .models import marca, guardia, permisos
+from .models import marca, guardia, permisos, visitantes, extras
 from datetime import datetime
 from django.views.generic.list import ListView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.db.models import Avg, Count, Min, Sum
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from easy_pdf.views import PDFTemplateView
 from django.conf import settings
 import django_excel as excel
@@ -20,7 +20,7 @@ def marcar(request):
         form = MarcarForm(request.POST)
         if form.is_valid():
             if (Profile.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
-
+                
                 trabajador = Profile.objects.get(cedula=form.cleaned_data['barcode'])
                 if 'entrada' in request.POST:
                     e = "E"
@@ -72,7 +72,7 @@ def diarioView(request):
         desde = hoy.strftime("%Y-%m-%d 00:00:00")
         hasta = hoy.strftime("%Y-%m-%d 23:59:59")
         result = marca.objects.filter(fecha__gte = desde,fecha__lte = hasta)
-        p = permisos.objects.filter(desde__gte = desde, hasta__lte = hasta )
+        p = permisos.objects.filter(hasta__lte = hasta )
     
     
     for trabajador in trabajadores:
@@ -362,3 +362,59 @@ def exportarhora(request):
     # se devuelve como "Response" el archivo para que se pueda "guardar"
     # en el navegador, es decir como hacer un "Download"
     return excel.make_response(sheet, "xlsx", file_name="reporte_excel")
+
+# class VisitantesCreate(CreateView):
+#     form_class = VisitarntesForm
+#     template_name = 'core/visitantes.html'
+    
+#     def get_success_url(self):
+#         print(self.request.method.POST['tipo'])
+#         return reverse('core:visitantes_add', kwargs={'marca': str(self.request.method.POST['tipo'])})
+
+
+def visitantes_add(request):
+    form = VisitarntesForm()
+    if request.method == 'POST':
+        form = VisitarntesForm(request.POST)
+        if form.is_valid():
+            m = form.save()
+            return render(request,'core/visitantes.html',{'form':form,'marca':form.cleaned_data['tipo'], 'hora':m.fecha})
+    return render(request,'core/visitantes.html',{'form':form})
+
+@method_decorator(login_required, name='dispatch')
+class VisitasListView(ListView):
+    model = visitantes
+    template_name = 'core/visitas.html'
+
+    def get_queryset(self):
+        if self.request.GET:
+            desde, hasta = self.request.GET['reservation'].split('-')
+            desde = desde.strip(' ')
+            hasta = hasta.strip(' ')
+            desde = datetime.strptime(desde, '%d/%m/%Y')
+            hasta = datetime.strptime(hasta, '%d/%m/%Y')
+            object_list = self.model.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+            if self.request.GET['departamento'] != "0":
+                object_list = object_list.filter(departamento = self.request.GET['departamento'])
+            
+        else:
+            object_list = self.model.objects.all()
+        return object_list
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dep = departamento.objects.all()
+        context["departamento"] = dep
+        return context
+
+class PermisosCreateView(CreateView):
+    form_class = PermisosForm
+    template_name = 'core/visitantes.html'
+
+class ExtraCreateView(CreateView):
+    form_class = ExtrasForm 
+    template_name = 'core/extras_add.html'
+
+class PermisosListView(ListView):
+    model = permisos
+    template_name = 'core/trabajadores.html'

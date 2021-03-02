@@ -24,7 +24,7 @@
 {% block contenido %}
     <div class="card">
         <div class="card-header">
-            <form method="post">{% csrf_token %}
+            <form method="GET">
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
@@ -54,15 +54,39 @@
                     </div>
                 </div>
                 <input type="submit" class="btn btn-outline-success float-right" value="Buscar">
-                <a class="btn btn-outline-info" href = "{% url "core:pdf" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> PDF </a>
-                <a class="btn btn-outline-info" href = "{% url "core:excel" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> Excel </a>
+                {% comment %} <a class="btn btn-outline-info" href = "{% url "core:pdf" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> PDF </a>
+                <a class="btn btn-outline-info" href = "{% url "core:excel" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> Excel </a> {% endcomment %}
             </form>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-            <h3>Entrada - Salida</h3>
+            <h3>Visitantes</h3>
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Departamento</th>
+                        <th>tipo</th>
+                        <th>Observación</th>
+                        <th>fecha</th>
+                        <th>Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hora in object_list %}
+                        <tr>
+                            <td> {{ hora.cedula}} </td>
+                            <td>{{ hora.nombre}} {{ hora.trabajador.apellido}}</td>
+                            <td>{{ hora.departamento}}</td>
+                            <td>{{ hora.get_tipo_display }}</td>
+                            <td>{{ hora.observacion}}</td>
+                            <td> {{ hora.fecha|date:"d/m/Y" }}</td>
+                            <td> {{ hora.fecha|date:"P" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
                     <tr>
                         <th>Cédula</th>
                         <th>Nombres y Apellidos</th>
@@ -72,106 +96,9 @@
                         <th>fecha</th>
                         <th>Hora</th>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for hora in object_list %}
-                        <tr>
-                            <td> {{ hora.trabajador.get_profile.cedula}} </td>
-                            <td>{{ hora.trabajador.first_name}} {{ hora.trabajador.last_name}}</td>
-                            <td>{{ hora.trabajador.get_profile.cargo}}</td>
-                            <td>{{ hora.trabajador.get_profile.departamento}}</td>
-                            <td>{{ hora.get_tipo_display }}</td>
-                            <td> {{ hora.fecha|date:"d/m/Y" }}</td>
-                            <td> {{ hora.fecha|date:"P" }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-
+                </tfoot>
             </table>
             
-            <h3>Horas Trabajadas</h3>
-            <table id="example2" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Nombres y Apellidos</th>
-                        <th>Cargo</th>
-                        <th>Departamento</th>
-                        <th>Horas R.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for hora in trabajadores %}
-                        {% if hora.tiempo > 0 %}
-                            <tr>
-                                <td> {{ hora.trabajador.cedula}} </td>
-                                <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
-                                <td>{{ hora.trabajador.cargo}}</td>
-                                <td>{{ hora.trabajador.departamento}}</td>
-                                <td>{% if hora.horas < 10 %}0{% endif %}{{ hora.horas }}:{% if hora.minutos < 10 %}0{% endif %}{{ hora.minutos }}:{% if hora.segundos < 10 %}0{% endif %}{{ hora.segundos }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-                
-            </table>
-
-            <h3>Guardias Trabajadas</h3>
-            <table id="example2" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Nombres y Apellidos</th>
-                        <th>Cargo</th>
-                        <th>Departamento</th>
-                        <th>Horas R.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for hora in trabajadores %}
-                        {% if hora.gt > 0 %}
-                            <tr>
-                                <td> {{ hora.trabajador.cedula}} </td>
-                                <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
-                                <td>{{ hora.trabajador.cargo}}</td>
-                                <td>{{ hora.trabajador.departamento}}</td>
-                                <td>{% if hora.horasg < 10 %}0{% endif %}{{ hora.horasg }}:{% if hora.minutosg < 10 %}0{% endif %}{{ hora.minutosg }}:{% if hora.segundosg < 10 %}0{% endif %}{{ hora.segundosg }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <h3>Permisos</h3>
-            <table id="example2" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Nombres y Apellidos</th>
-                        <th>Cargo</th>
-                        <th>Departamento</th>
-                        <th>Motivo</th>
-                        <th>Observación</th>
-                        <th>fecha</th>
-                        <th>Adjunto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for permiso in permisos %}
-                        <tr>
-                            <td> {{ permiso.trabajador.get_profile.cedula}} </td>
-                            <td>{{ permiso.trabajador.first_name}} {{ hora.trabajador.last_name}}</td>
-                            <td>{{ permiso.trabajador.get_profile.cargo}}</td>
-                            <td>{{ permiso.trabajador.get_profile.departamento}}</td>
-                            <td>{{ permiso.get_motivo_display }}</td>
-                            <td>{{ permiso.Observacion }}</td>
-                            <td>{{ permiso.desde|date:"d/m/Y P" }} - {{ permiso.hasta|date:"d/m/Y P"}}</td>
-                            <td><a href="{{ permiso.archivo.url }}">ver</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-                
-            </table>
         </div>
         <!-- /.card-body -->
     </div>
