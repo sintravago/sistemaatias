@@ -164,9 +164,9 @@
                             <td>{{ permiso.trabajador.get_profile.cargo}}</td>
                             <td>{{ permiso.trabajador.get_profile.departamento}}</td>
                             <td>{{ permiso.get_motivo_display }}</td>
-                            <td>{{ permiso.Observacion }}</td>
+                            <td>{{ permiso.observacion }}</td>
                             <td>{{ permiso.desde|date:"d/m/Y P" }} - {{ permiso.hasta|date:"d/m/Y P"}}</td>
-                            <td><a href="{{ permiso.archivo.url }}">ver</a></td>
+                            <td>{% if permiso.archivo %}<a href="{{ permiso.archivo.url }}">ver</a>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

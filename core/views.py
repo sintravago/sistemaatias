@@ -12,6 +12,7 @@ from django.urls import reverse_lazy, reverse
 from easy_pdf.views import PDFTemplateView
 from django.conf import settings
 import django_excel as excel
+from django.db.models import Q
 # Create your views here.
 
 def marcar(request):
@@ -63,8 +64,10 @@ def diarioView(request):
         hasta = hasta.strip(' ')
         desde = datetime.strptime(desde, '%d/%m/%Y')
         hasta = datetime.strptime(hasta, '%d/%m/%Y')
-        p = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d 00:00:00'), hasta__lte = hasta.strftime('%Y-%m-%d 23:59:59') )
-        result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        print(desde.strftime('%Y-%m-%d 00:00:01'))
+        print(hasta.strftime('%Y-%m-%d 23:59:59'))
+        p = permisos.objects.filter(Q(desde__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))) | Q(hasta__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))))
+        result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:0'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         if request.POST['departamento'] != "0":
             result = result.filter(trabajador__get_profile__departamento = request.POST['departamento'])
     else:
