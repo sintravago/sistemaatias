@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from registration.models import departamento
+from registration.models import departamento, Trabajador
 # Create your models here.
 
 def user_directory_path(instance, filename):
@@ -18,7 +18,7 @@ class permisos(models.Model):
     hasta = models.DateTimeField()
     motivo = models.CharField(max_length=1, choices=tipo_permiso, default='P',)
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
-    trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.PROTECT, related_name="get_trabajador")
+    trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT, related_name="get_trabajador")
     archivo = models.FileField(upload_to=user_directory_path, null=True, blank=True)
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_usuario")
 
@@ -26,7 +26,7 @@ class extras(models.Model):
     entrada = models.DateTimeField()
     salida = models.DateTimeField()
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
-    trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.CASCADE)
+    trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.CASCADE)
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user")
     
     def __str__(self):
@@ -36,7 +36,8 @@ class guardia(models.Model):
     entrada = models.DateTimeField()
     salida = models.DateTimeField()
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
-    trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.PROTECT)
+    trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_g")
     
     def __str__(self):
         return "{} - {}".format(self.entrada,self.salida)
@@ -54,7 +55,7 @@ class marca(models.Model):
     tipo = models.CharField(max_length=1, choices=tipo_marca, default='E')
     modo = models.CharField(max_length=1, choices=modo_marca, default='R')
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
-    trabajador = models.ForeignKey(User, verbose_name="Trabajador", on_delete=models.PROTECT)
+    trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT)
 
     def __str__(self):
         return "{:%d/%m/%Y}".format(self.fecha)
@@ -75,3 +76,4 @@ class visitantes(models.Model):
     tipo = models.CharField(max_length=1, verbose_name="Tipo", choices=tipo_marca, default='E')
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_v")

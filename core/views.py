@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import MarcarForm, VisitarntesForm, PermisosForm, ExtrasForm
-from registration.models import Profile, horario, departamento
+from registration.models import Trabajador, horario, departamento
 from .models import marca, guardia, permisos, visitantes, extras
 from datetime import datetime
 from django.views.generic.list import ListView
@@ -20,9 +20,9 @@ def marcar(request):
     if request.method == 'POST':
         form = MarcarForm(request.POST)
         if form.is_valid():
-            if (Profile.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
+            if (Trabajador.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
                 
-                trabajador = Profile.objects.get(cedula=form.cleaned_data['barcode'])
+                trabajador = Trabajador.objects.get(cedula=form.cleaned_data['barcode'])
                 if 'entrada' in request.POST:
                     e = "E"
                 else:
@@ -42,7 +42,7 @@ def marcar(request):
 
 @method_decorator(login_required, name='dispatch')
 class TrabajadoresListView(ListView):
-    model = Profile
+    model = Trabajador
     template_name = 'core/trabajadores.html'
 
 @method_decorator(login_required, name='dispatch')
@@ -55,7 +55,7 @@ class HoyListView(ListView):
 @login_required
 def diarioView(request):
     dep = departamento.objects.all()
-    trabajadores = Profile.objects.all()
+    trabajadores = Trabajador.objects.all()
     list_t = {}
     list_tt = []
     if request.POST:
@@ -69,7 +69,7 @@ def diarioView(request):
         p = permisos.objects.filter(Q(desde__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))) | Q(hasta__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))))
         result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:0'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         if request.POST['departamento'] != "0":
-            result = result.filter(trabajador__get_profile__departamento = request.POST['departamento'])
+            result = result.filter(trabajador__departamento = request.POST['departamento'])
     else:
         hoy = datetime.now()
         desde = hoy.strftime("%Y-%m-%d 00:00:00")
@@ -117,7 +117,7 @@ def diarioView(request):
 
 @login_required        
 def fechaView(request):
-    trabajadores = Profile.objects.all()
+    trabajadores = Trabajador.objects.all()
     dep = departamento.objects.all()
     list_t = {}
     list_tt = []
@@ -157,7 +157,7 @@ class ReportePDFView(PDFTemplateView):
     # download_filename = 'presupuesto.pdf'
     def get_context_data(self, **kwargs):
         dep = departamento.objects.all()
-        trabajadores = Profile.objects.all()
+        trabajadores = Trabajador.objects.all()
         list_t = {}
         list_tt = []
         fecha = 0
@@ -231,7 +231,7 @@ class ReportePDFView(PDFTemplateView):
 def exportarhora(request):
     # Obtenemos la fecha para agregarla al nombre del archivo
     dep = departamento.objects.all()
-    trabajadores = Profile.objects.all()
+    trabajadores = Trabajador.objects.all()
     list_t = {}
     list_tt = []
     if request.POST:
@@ -243,7 +243,7 @@ def exportarhora(request):
         p = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d 00:00:00'), hasta__lte = hasta.strftime('%Y-%m-%d 23:59:59') )
         result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         if request.POST['departamento'] != "0":
-            result = result.filter(trabajador__get_profile__departamento = request.POST['departamento'])
+            result = result.filter(trabajador__departamento = request.POST['departamento'])
     else:
         hoy = datetime.now()
         desde = hoy.strftime("%Y-%m-%d 00:00:00")
@@ -300,10 +300,10 @@ def exportarhora(request):
     ])
     for hora in result:
         export.append([
-            hora.trabajador.get_profile.cedula,
+            hora.trabajador.cedula,
             "{} {}".format(hora.trabajador.first_name,hora.trabajador.last_name),
-            hora.trabajador.get_profile.cargo,
-            hora.trabajador.get_profile.departamento.nombre,
+            hora.trabajador.cargo.nombre,
+            hora.trabajador.departamento.nombre,
             hora.get_tipo_display(),
             "{:%d/%m/%Y}".format(hora.fecha),
             "{:%I:%M:%S %P}".format(hora.fecha),
@@ -345,10 +345,10 @@ def exportarhora(request):
 
     for permiso in p:
         export.append([
-            permiso.trabajador.get_profile.cedula,
+            permiso.trabajador.cedula,
             "{} {}".format(permiso.trabajador.first_name,permiso.trabajador.last_name),
-            permiso.trabajador.get_profile.cargo,
-            permiso.trabajador.get_profile.departamento.nombre,
+            permiso.trabajador.cargo.nombre,
+            permiso.trabajador.departamento.nombre,
             permiso.get_motivo_display(),
             permiso.observacion,
             "{:%d/%m/%Y} - {:%d/%m/%Y}".format(permiso.desde, permiso.hasta),
