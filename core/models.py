@@ -14,12 +14,12 @@ class permisos(models.Model):
         ('R', 'Reposo'),
         ('O', 'Otro'),
     ]
-    desde = models.DateTimeField()
-    hasta = models.DateTimeField()
+    desde = models.DateField()
+    hasta = models.DateField()
     motivo = models.CharField(max_length=1, choices=tipo_permiso, default='P',)
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT, related_name="get_trabajador")
-    archivo = models.FileField(upload_to=user_directory_path, null=True, blank=True)
+    archivo = models.FileField(upload_to=user_directory_path, null=True)
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_usuario")
 
 class extras(models.Model):

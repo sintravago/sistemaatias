@@ -75,26 +75,26 @@ WSGI_APPLICATION = 'horario.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-
 DATABASES = {
-    'default': {
-       'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CONASIS',
-        'USER': 'conasis',
-        'PASSWORD': 'zxasqw123*',
-        'HOST': 'srvdb',
-        'PORT': '1433',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        }
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.sqlite3',
+       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+   }
 }
+
+# DATABASES = {
+#     'default': {
+#        'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'CONASIS',
+#         'USER': 'conasis',
+#         'PASSWORD': 'zxasqw123*',
+#         'HOST': 'srvdb',
+#         'PORT': '1433',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         }
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

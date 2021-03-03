@@ -13,7 +13,7 @@
       <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fas fa-ban"></i> Error!</h5>
-        {{ error|escape }}
+        {{ error|escape }} {{ field.name }}
       </div>
     {% endfor %}
   {% endfor %}
@@ -21,40 +21,9 @@
     <div class="alert alert-danger alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
       <h5><i class="icon fas fa-ban"></i> Error!</h5>
-        {{ error|escape }}
+        {{ error|escape }} {{ field.name }}
     </div>
   {% endfor %}
-{% endif %}
-{% if marca == 'E' %}
-  <div class="alert alert-success alert-dismissible">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-    <h5><i class="icon fas fa-check"></i> Entrada!</h5>
-    {{ trabajador }} entro a las {{ hora|time:"h:i:s A" }}.
-  </div>
-{% elif marca == 'S' %}
-  <div class="alert alert-success alert-dismissible">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-    <h5><i class="icon fas fa-check"></i> Salida!</h5>
-    {{ trabajador }} salio a las {{ hora|time:"h:i:s A" }}.
-  </div>
-{% elif marca == 'no' %}
-  <div class="alert alert-danger alert-dismissible">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-      <h5><i class="icon fas fa-ban"></i> Error!</h5>
-        Persona no registrada o código invalido
-    </div>
-{% elif marca == 'ya' %}
-  <div class="alert alert-danger alert-dismissible">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-      <h5><i class="icon fas fa-ban"></i> Error!</h5>
-        Persona ya marco {% if e == "E" %} entrada {% else %} salida {% endif %}
-    </div>
-{% elif marca == 'p' %}
-  <div class="alert alert-danger alert-dismissible">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-      <h5><i class="icon fas fa-ban"></i> Error!</h5>
-        Debe marcar primero su entrada
-    </div>
 {% endif %}
 
 <div class="card">
@@ -64,17 +33,94 @@
   </div>  {% endcomment %}
   <!-- /.card-header -->
   <div class="card-body">
-    <form method="post">{% csrf_token %}
-      {{ form }}
-      <br/>
-      <div class="btn-group float-right">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-6">  
+          <div class="form-group">
+            <label>Desde:</label>
+              <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  <input id="id_desde" name="desde" type="text" class="form-control datetimepicker-input" data-target="#reservationdate" required />
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
         
-        <input type="submit" class="btn btn-outline-success " name="Salida" id="Salida" value="Aceptar">
-      </div>
+          <div class="form-group" >
+            <label>Motivo</label>
+            <select class="select2bs4" name="motivo" id="id_motivo" style="width: 100%;" >
+              {% for per in tipo_permiso %}
+                <option value={{per.0}}>{{per.1}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" >
+            <label>Trabajador</label>
+            <select class="select2bs4" name="trabajador" id="id_trabajador" style="width: 100%;" required>
+              {% for tra in trabajadores %}
+                  <option value = {{tra.id }} >{{ tra.nombre }} {{ tra.apellido }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Hasta:</label>
+              <div class="input-group date" id="reservationdatehasta" data-target-input="nearest">
+                  <input id="id_hasta" name="hasta" type="text" class="form-control datetimepicker-input" data-target="#reservationdatehasta" required />
+                  <div class="input-group-append" data-target="#reservationdatehasta" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label for="archivo">Archivo</label>
+              {{form.archivo}}
+            {% comment %} <div class="input-group">
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="id_archivo" name="archivo">
+                <label class="custom-file-label" for="id_archivo">Seleccione un Archivo</label>
+              </div>
+            </div>  {% endcomment %}
+          </div>
+          <div class="form-group">
+            <label> Observación </label>
+            <textarea class="form-control" rows="3" name="observacion" id="id_observacion" placeholder="..."></textarea>
+          </div>
+          <div class="btn-group float-right">
+            <input type="submit" class="btn btn-outline-success " name="Salida" id="Salida" value="Aceptar">
+          </div>
+        </div>
+        <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
     </form>
   </div>
   <!-- /.card-body -->
 </div>
 <!-- /.card -->
 
+{% endblock %}
+{% block script %}
+  <!-- bs-custom-file-input -->
+<script src="{% static 'core/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+  <script>
+    $(function () {
+      //Date range picker
+      $('.select2').select2()
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('#reservationdatehasta').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+    })      
+  </script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    bsCustomFileInput.init();
+  });
+</script>
 {% endblock %}

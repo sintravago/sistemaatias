@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "/home/victor/miniconda3/envs/desarrollo/bin/python"
     "workbench.iconTheme": "material-icon-theme",
     "workbench.colorTheme": "Atom One Dark",
     "python.linting.pylintArgs": [
@@ -7,4 +6,5 @@
         "--load-plugins",
         "pylint_django",
     ],
+    "python.pythonPath": "/home/victor/miniconda3/envs/desarrollo/bin/python",
 }

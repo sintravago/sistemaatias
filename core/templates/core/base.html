@@ -254,14 +254,38 @@
             </a>
           </li>
           {% if request.user.is_authenticated %}
-            <li class="nav-item">
-              <a href="{% url 'core:trabajadores' %}" class="nav-link {% if 'trabajadores' in request.path %} active {% endif %}">
+            <li class="nav-item has-treeview {% if 'trabajadores/' in request.path %} menu-open {% endif %}">
+              <a href="#" class="nav-link {% if 'trabajadores/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-users"></i>
                 <p>
                   Trabajadores
+                  <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="./index.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Registrar</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'core:trabajadores' %}" class="nav-link {% if 'trabajadores/ver' in request.path %} active {% endif %}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Buscar</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'core:permisos_add' %}" class="nav-link {% if 'permisos' in request.path %} active {% endif %}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Registrar Permiso
+                    </p>
+                  </a>
+                </li>
+              </ul>
             </li>
+            
             <li class="nav-item">
               <a href="{% url 'core:visitas' %}" class="nav-link {% if 'visitas' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-users"></i>
@@ -270,14 +294,7 @@
                 </p>
               </a>
             </li>
-            <li class="nav-item">
-              <a href="{% url 'core:permisos_add' %}" class="nav-link {% if 'permisos' in request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-users"></i>
-                <p>
-                  Registrar Permiso
-                </p>
-              </a>
-            </li>
+            
             <li class="nav-item">
               <a href="{% url 'core:extras_add' %}" class="nav-link {% if 'extras' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>

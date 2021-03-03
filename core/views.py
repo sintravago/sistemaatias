@@ -44,6 +44,25 @@ def marcar(request):
 class TrabajadoresListView(ListView):
     model = Trabajador
     template_name = 'core/trabajadores.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.all()
+        
+        if self.request.method == "GET" and "search" in self.request.GET:
+            name = self.request.GET['search']
+            if (name != ''):
+                if len(name.split()) > 1:
+                    for x in name.split():
+                        object_list = object_list.filter(Q(nombre__icontains = x) | Q(apellido__icontains = x))
+                else:
+                    object_list = object_list.filter(Q(nombre__icontains = name) | Q(apellido__icontains = name) | Q(cedula__icontains = name) | Q(cargo__nombre__icontains = name) | Q(departamento__nombre__icontains = name) | Q(codigo__icontains = name))
+        return object_list
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departamentos'] = departamento.objects.all()
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class HoyListView(ListView):
@@ -410,9 +429,35 @@ class VisitasListView(ListView):
         context["departamento"] = dep
         return context
 
+# def permisosAdd(request):
+#     if request.method == 'POST':
+#         form = PermisosForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             print(request.FILES['archivo'])
+#             instance = permisos(archivo=request.FILES['archivo'], desde=form.cleaned_data['desde'], hasta=form.cleaned_data['hasta'], trabajador=form.cleaned_data['trabajador'], user=form.cleaned_data['user'])
+#             instance.save()
+#             #return reverse_lazy("core:trabajadores")
+
+#     else:
+#         form = PermisosForm()
+#     per = permisos.tipo_permiso
+#     tra = Trabajador.objects.all()
+#     return render(request, 'core/permisos_add.html', {'form': form, 'tipo_permiso': per, "trabajadores": tra})
+
 class PermisosCreateView(CreateView):
     form_class = PermisosForm
-    template_name = 'core/visitantes.html'
+    template_name = 'core/permisos_add.html'
+    success_url = reverse_lazy("core:trabajadores")
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        per = permisos.tipo_permiso
+        tra = Trabajador.objects.all()
+        context["tipo_permiso"] = per
+        context["trabajadores"] = tra
+        return context
+
 
 class ExtraCreateView(CreateView):
     form_class = ExtrasForm 

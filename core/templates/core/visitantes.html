@@ -1,9 +1,9 @@
 {% extends "core/base.html" %}
-{% block title %} Horario {% endblock %}
+{% block title %} Visitantes {% endblock %}
 {% load static %}
-{% block titulo %} Entrada / Salida {% endblock %}
+{% block titulo %}  {% endblock %}
 {% block breadcums %} 
-    <li class="breadcrumb-item"><a href="#">Horario</a></li>
+    
 {% endblock %}
 
 {% block contenido %}
@@ -59,9 +59,9 @@
 
 <div class="card">
 
-  {% comment %} <div class="card-header">
-    <h3 class="card-title">DataTable with default features</h3>
-  </div>  {% endcomment %}
+  <div class="card-header">
+    <h3 class="card-title">Visitantes</h3>
+  </div> 
   <!-- /.card-header -->
   <div class="card-body">
     <form method="post">{% csrf_token %}
