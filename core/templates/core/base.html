@@ -55,7 +55,7 @@
       </li> {% endcomment %}
     </ul>
 
-    <!-- SEARCH FORM -->
+    {% comment %} <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
       <div class="input-group input-group-sm">
         <input class="form-control form-control-navbar" type="search" placeholder="Buscar" aria-label="Search">
@@ -65,7 +65,7 @@
           </button>
         </div>
       </div>
-    </form>
+    </form> {% endcomment %}
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
@@ -246,7 +246,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:visitantes_add' %}" class="nav-link {% if "visitantes" in request.path %} active {% endif %}">
+            <a href="{% url 'core:visitante_add' %}" class="nav-link {% if "visitante/add" in request.path %} active {% endif %}">
               <i class="nav-icon fas fa-edit"></i>
               <p>
                 Visitantes
@@ -254,8 +254,8 @@
             </a>
           </li>
           {% if request.user.is_authenticated %}
-            <li class="nav-item has-treeview {% if 'trabajadores/' in request.path %} menu-open {% endif %}">
-              <a href="#" class="nav-link {% if 'trabajadores/' in request.path %} active {% endif %}">
+            <li class="nav-item has-treeview {% if 'trabajadores' in request.path %} menu-open {% endif %}">
+              <a href="#" class="nav-link {% if 'trabajadores'   in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-users"></i>
                 <p>
                   Trabajadores
@@ -264,42 +264,78 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./index.html" class="nav-link">
+                  <a href="{% url 'core:trabajador_add'%}" class="nav-link {% if 'trabajadores/add' in request.path %} active {% endif %}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Registrar</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{% url 'core:trabajadores' %}" class="nav-link {% if 'trabajadores/ver' in request.path %} active {% endif %}">
+                  <a href="{% url 'core:trabajadores' %}" class="nav-link {% if 'trabajadores/search' in request.path %} active {% endif %}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Buscar</p>
                   </a>
                 </li>
+              </ul>
+            </li>
+            <li class="nav-item has-treeview {% if 'permisos' in request.path %} menu-open {% endif %}">
+              <a href="#" class="nav-link {% if 'permisos' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-notes-medical"></i>
+                <p>
+                  Permisos
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{% url 'core:permisos_add' %}" class="nav-link {% if 'permisos' in request.path %} active {% endif %}">
+                  <a href="{% url 'core:permiso_add' %}" class="nav-link {% if 'permisos/add' in request.path %} active {% endif %}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>
-                      Registrar Permiso
+                      Registrar
+                    </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'core:permisos' %}" class="nav-link {% if 'permisos/search' in request.path %} active {% endif %}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Buscar
                     </p>
                   </a>
                 </li>
               </ul>
             </li>
-            
-            <li class="nav-item">
-              <a href="{% url 'core:visitas' %}" class="nav-link {% if 'visitas' in request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-users"></i>
+            <li class="nav-item has-treeview {% if 'extras' in request.path %} menu-open {% endif %}">
+              <a href="#" class="nav-link {% if 'extras' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-notes-medical"></i>
                 <p>
-                  Visitas
+                  Horas Extras
+                  <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'core:extras_add' %}" class="nav-link {% if 'extras/add' in request.path %} active {% endif %}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Registrar
+                    </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'core:extras' %}" class="nav-link {% if 'extras/search' in request.path %} active {% endif %}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Buscar
+                    </p>
+                  </a>
+                </li>
+              </ul>
             </li>
-            
             <li class="nav-item">
-              <a href="{% url 'core:extras_add' %}" class="nav-link {% if 'extras' in request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-calendar-check"></i>
+              <a href="{% url 'core:visitas' %}" class="nav-link {% if 'visitantes' in request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-user-friends"></i>
                 <p>
-                  Horas extras
+                  Visitas
                 </p>
               </a>
             </li>

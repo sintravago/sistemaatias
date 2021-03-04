@@ -1,0 +1,123 @@
+{% extends "core/base.html" %}
+{% block title %} Permisos {% endblock %}
+{% load static %}
+{% block titulo %}  {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+<form method="GET">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Permisos</h3>
+                    
+                    <div class="card-tools">
+                        <div class="row">
+                            <div class = "col-6">
+                                <div class="input-group" style="width: 300px;">
+                                    <select class="select2bs4" name="permisos" id="permisos" required>
+                                    <option value = "0" >Todos</option>
+                                    {% for per in permisos %}
+                                        <option value = {{per.0}} {% if per.0 == request.GET.permisos %} selected {% endif %}>{{per.1}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class = "col-6">
+                                <div class="input-group" style="width: 300px;">
+                                    <input type="text" name="search" id="search" class="form-control float-right" placeholder="Buscar" value ="{{ request.GET.search }}">  
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table id="example1" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombres y Apellidos</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Motivo</th>
+                                <th>Detalle</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for permiso in object_list %}
+                                <tr>
+                                    <td> <a href="{% url 'core:trabajador_view' permiso.trabajador.id %}">{{ permiso.trabajador.cedula }} </a></td>
+                                    <td>{{ permiso.trabajador.nombre }} {{ permiso.trabajador.apellido }}</td>
+                                    <td>{{ permiso.desde|date:"d/m/Y" }}</td>
+                                    <td>{{ permiso.hasta|date:"d/m/Y" }}</td>
+                                    <td>{{ permiso.get_motivo_display }}</td>
+                                    <td><a href="{% url 'core:permiso_view' permiso.id %}" ><i class="fas fa-eye"></i></a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan = 6>No hay permisos aún.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              <!-- /.card-body -->
+                <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        {% if page_obj.has_previous %}
+                        <li class="paginate_button page-item first">
+                            <a class="page-link" href="?page=1">&laquo; Primera</a>
+                        </li>
+                        <li class="paginate_button page-item previous">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="paginate_button page-item active">
+                            <a class="page-link" >Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</a>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                        <li class="paginate_button page-item next">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                        </li>
+                        <li class="paginate_button page-item last">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Ultima &raquo;</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% comment %} <a class="btn btn-outline-success float-left" href="{% url 'presupuestos:agremiado-add'%}"><i class="fas fa-plus-square mr-1"></i> Registrar Agremiado </a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script>
+$(function () {
+    $('.select2bs4').select2({
+        theme: 'bootstrap4'
+    })
+})
+</script>
+{% endblock %}

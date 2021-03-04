@@ -1,0 +1,101 @@
+{% extends "core/base.html" %}
+{% block title %} Visitantes {% endblock %}
+{% load static %}
+{% block titulo %}  {% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card">
+
+  <div class="card-header">
+    <h3 class="card-title">Visitantes</h3>
+  </div> 
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form method="post">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Cédula</label>
+            <input type="number" class="form-control" name="cedula" id="id_cedula" required>
+          </div>
+          
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" class="form-control" value="" name="nombre" id="id_nombre" required>
+          </div>
+          
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" class="form-control" value="" name="apellido" id="id_apellido" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group" >
+            <label>Departamento</label>
+            <select class="select2bs4" name="departamento" id="id_departamento" style="width: 100%;" required >
+              {% for dep in departamento %}
+                <option value={{dep.id}}>{{dep.nombre}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label> Observación </label>
+            <textarea class="form-control" rows="3" name="observacion" id="id_observacion" placeholder="..."></textarea>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+      <div class="btn-group float-right">
+        <input type="submit" class="btn btn-outline-info " name="tipo" id="id_tipo" value="Salida"/>
+        <input type="submit" class="btn btn-outline-success " name="tipo" id="id_tipo" value="Entrada"/>
+      </div>
+    </form>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(function () {
+      //Date range picker
+      $('.select2').select2()
+
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+    })      
+  </script>
+{% endblock %}

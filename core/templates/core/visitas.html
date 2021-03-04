@@ -1,7 +1,7 @@
 {% extends "core/base.html" %}
-{% block title %} Registro {% endblock %}
+{% block title %} Visitantes {% endblock %}
 {% load static %}
-{% block titulo %} Registro {% endblock %}
+{% block titulo %} {% endblock %}
 {% block head %} 
     <!-- DataTables -->
   <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
@@ -24,12 +24,16 @@
 {% block contenido %}
     <div class="card">
         <div class="card-header">
+            <h3 class="card-title">Visitantes</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
             <form method="GET">
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label>Departamento</label>
-                            <select class="select2bs4" name="departamento" id="departamento" required>
+                            <select class="select2bs4" name="departamento" id="departamento" style="width:80%" required>
                             <option value = "0">Todos</option>
                             {% for dep in departamento %}
                                 <option value = {{dep.pk}} {% if dep.id|floatformat == request.POST.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
@@ -57,10 +61,6 @@
                 {% comment %} <a class="btn btn-outline-info" href = "{% url "core:pdf" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> PDF </a>
                 <a class="btn btn-outline-info" href = "{% url "core:excel" %}{% if request.POST.reservation %}?fecha={{request.POST.reservation}}{% if request.POST.departamento %}&departamento={{request.POST.departamento}}{% endif %}{% elif request.POST.departamento %}?departamento={{request.POST.reservation}}{% endif %}"> Excel </a> {% endcomment %}
             </form>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-            <h3>Visitantes</h3>
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>

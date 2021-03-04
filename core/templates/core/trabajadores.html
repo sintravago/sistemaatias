@@ -50,7 +50,7 @@
                         <thead>
                             <tr>
                                 <th>Cédula</th>
-                                <th>Codigo</th>
+                                <th>Código</th>
                                 <th>Nombres y Apellidos</th>
                                 <th>Cargo</th>
                                 <th>Departamento</th>
@@ -60,7 +60,7 @@
                         <tbody>
                             {% for trabajador in object_list %}
                                 <tr>
-                                    <td> {{ trabajador.cedula }} </td>
+                                    <td> <a href="{% url 'core:trabajador_view' trabajador.id %}">{{ trabajador.cedula }}</a> </td>
                                     <td> {{ trabajador.codigo }} </td>
                                     <td>{{ trabajador.nombre }} {{ trabajador.apellido }}</td>
                                     <td>{{ trabajador.cargo }}</td>

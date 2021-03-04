@@ -1,0 +1,138 @@
+{% extends "core/base.html" %}
+{% block title %} Trabajador {% endblock %}
+{% load static %}
+{% block titulo %}  {% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card">
+
+  <div class="card-header">
+    <h3 class="card-title">Editar Trabajador</h3>
+  </div> 
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form method="post">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Cédula</label>
+            <input type="number" class="form-control" name="cedula" id="id_cedula" value={{ object.cedula }} required>
+          </div>
+          <div class="form-group">
+            <label>Código</label>
+            <input type="number" class="form-control" name="codigo" id="id_codigo" value={{ object.codigo }}>
+          </div>
+          <div class="form-group" >
+            <label>Departamento</label>
+            <select class="select2bs4" name="departamento" id="id_departamento" style="width: 100%;" required>
+              {% for dep in departamento %}
+                <option value={{dep.id}} {% if dep.id == object.departamento.id %} selected {% endif %}>{{dep.nombre}} </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" >
+            <label>Cargo</label>
+            <select class="select2bs4" name="cargo" id="id_cargo" style="width: 100%;" required>
+              {% for car in cargo %}
+                <option value={{car.id}} {% if car.id == object.cargo.id %} selected {% endif %}>{{car.nombre}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" class="form-control" value="{{ object.nombre }}" name="nombre" id="id_nombre" value={{ object.nombre }} required>
+          </div>
+          <div class="form-group">
+            <label>F. Nacimiento:</label>
+              <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  <input id="id_nacimiento" name="nacimiento" type="text" class="form-control datetimepicker-input" data-target="#reservationdate" value={{ object.nacimiento|date:"d/m/Y" }} required />
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label>Tlf1</label>
+            {{ form.tlf1 }}
+          </div>
+          <div class="form-group" >
+            <label>Horario</label>
+            <select class="select2bs4" name="horario" id="id_horario" style="width: 100%;" required>
+              {% for hor in horario %}
+                <option value={{hor.id}} {% if hor.id == object.horario.id %} selected {% endif %}>{{hor.nombre}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" class="form-control" value="{{ object.apellido }}" name="apellido" id="id_apellido" required>
+          </div>
+          <div class="form-group" >
+            <label>Sexo</label>
+            <select class="select2bs4" name="sexo" id="id_sexo" style="width: 100%;" required>
+              {% for sex in sexo %}
+                <option value={{sex.0}} {% if sex.0 == object.sexo %} selected {% endif %}>{{sex.1}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tlf2</label>
+
+            {{ form.tlf2 }}
+            <!-- /.input group -->
+          </div>
+        </div>
+      </div>
+      <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+      <div class="btn-group float-right">
+        <input type="submit" class="btn btn-outline-success " value="Aceptar"/>
+      </div>
+    </form>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(function () {
+      $('[data-mask]').inputmask()
+      //Date range picker
+      $('.select2').select2();
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+    })      
+  </script>
+{% endblock %}

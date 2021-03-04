@@ -19,7 +19,7 @@ class permisos(models.Model):
     motivo = models.CharField(max_length=1, choices=tipo_permiso, default='P',)
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT, related_name="get_trabajador")
-    archivo = models.FileField(upload_to=user_directory_path, null=True)
+    archivo = models.FileField(upload_to=user_directory_path, null=True,  blank=True)
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_usuario")
 
 class extras(models.Model):
@@ -31,6 +31,16 @@ class extras(models.Model):
     
     def __str__(self):
         return "{} - {}".format(self.entrada,self.salida)
+    
+    def diferencia(self):
+        dif = (self.salida - self.entrada).total_seconds()
+        horas = int(dif // 3600)
+        segundos = int(dif % 3600)
+        minutos = int(segundos // 60)
+        segundo = int(segundos % 60)
+
+        return "{:02d}:{:02d}:{:02d}".format(horas,minutos,segundos)
+        
 
 class guardia(models.Model):
     entrada = models.DateTimeField()

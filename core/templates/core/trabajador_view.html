@@ -1,0 +1,131 @@
+{% extends "core/base.html" %}
+{% block title %} Trabajador {% endblock %}
+{% load static %}
+{% block titulo %}  {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+
+    <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'core/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Detalle del Trabajador</h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <table style="width:100%">
+                <tbody>
+                    <tr>
+                        <td><label>Cédula</label> <p>{{ object.cedula }}</p></td>
+                        <td><label>Código</label> <p>{% if object.codigo %} {{ object.codigo }} {% endif %}</p></td>
+                        <td><label>Nombre</label> <p>{{ object.nombre }}</p></td>
+                        <td><label>Apellido</label> <p>{{ object.apellido }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><label>F. Nacimiento</label> <p>{{ object.nacimiento|date:"d/m/Y" }} ({{ object.edad }} años)</p></td>
+                        <td><label>Sexo</label> <p>{{ object.get_sexo_display }} </p></td>
+                        <td><label>Departamento</label> <p>{{ object.departamento }} </p></td>
+                        <td><label>Cargo</label> <p>{{ object.cargo }} </p></td>
+                    </tr>
+                    <tr>
+                        <td><label>Horario</label> <p>{{ object.horario }} </p></td>
+                        <td><label>Tlf1</label> <p>{% if object.tlf1 %}{{ object.tlf1 }} {% endif %}</p></td>
+                        <td><label>Tlf2</label> <p>{% if object.tlf2 %}{{ object.tlf2 }} {% endif %}</p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="{% url 'core:trabajadores' %}" class="btn btn-outline-info " />Trabajadores</a>
+            <a href="{% url 'core:trabajador_edit' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
+        </div>
+        <!-- /.card-body -->
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'core/plugins/select2/js/select2.full.min.js' %}"></script>
+
+
+
+<script>
+    $(function () {
+        $("#example1").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+        });
+
+        $("#example2").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+        });
+        $('.select2bs4').select2({
+          theme: 'bootstrap4'
+        })
+
+        //Datemask dd/mm/yyyy
+        $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        //Datemask2 mm/dd/yyyy
+        $('#datemask2').inputmask('dd/mm/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+        //Money Euro
+        $('[data-mask]').inputmask()
+
+        //Date range picker
+        $('#reservationdate').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
+        //Date range picker
+        $('#reservation').daterangepicker({
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        })
+        //Date range picker with time picker
+        $('#reservationtime').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 30,
+            locale: {
+                format: 'DD/MM/YYYY hh:mm A'
+            }
+        })
+        
+        //Date range as a button
+        $('#daterange-btn').daterangepicker(
+        {
+            ranges   : {
+            'Today'       : [moment(), moment()],
+            'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+            'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            startDate: moment().subtract(29, 'days'),
+            endDate  : moment()
+        },
+        function (start, end) {
+            $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+        }
+        )
+    });
+</script>
+{% endblock %}

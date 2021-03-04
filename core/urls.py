@@ -4,15 +4,22 @@ from . import views
 
 core_patterns = ([
     path('', views.marcar, name ='index'),
-    path('trabajadores/ver', views.TrabajadoresListView.as_view(), name ='trabajadores'),
+    path('trabajadores/search', views.TrabajadoresListView.as_view(), name ='trabajadores'),
+    path('trabajadores/add', views.TrabajadorCreateView.as_view(), name ='trabajador_add'),
+    path('trabajadores/edit/<int:pk>', views.TrabajadorUpdate.as_view(), name ='trabajador_edit'),
+    path('permisos/add', views.PermisosCreateView.as_view(), name ='permiso_add'),
+    path('permisos/view/<int:pk>', views.PermisoDetailView.as_view(), name ='permiso_view'),
+    path('permisos/edit/<int:pk>', views.PermisoUpdate.as_view(), name ='permiso_edit'),
+    path('permisos/search', views.PermisosListView.as_view(), name ='permisos'),
+    path('trabajadores/view/<int:pk>', views.TrabajadorDetailView.as_view(), name ='trabajador_view'),
     path('reportepdf/', views.ReportePDFView.as_view(), name ='pdf'),
     path('reportexcel/', views.exportarhora, name ='excel'),
     path('reporte/diario/', views.diarioView, name ='diario'),
     path('reporte/fecha', views.fechaView, name ='fecha'),
-    path('visitantes', views.visitantes_add, name ='visitantes_add'),
-    path('trabajadores/permisos/add', views.PermisosCreateView.as_view(), name ='permisos_add'),
+    path('visitante/add', views.visitantesAdd, name ='visitante_add'),
     path('extras/add', views.ExtraCreateView.as_view(), name ='extras_add'),
-    path('visitas', views.VisitasListView.as_view(), name ='visitas'),
+    path('extras/search', views.ExtraListView.as_view(), name ='extras'),
+    path('visitantes', views.VisitasListView.as_view(), name ='visitas'),
 
 ], 'core')
 
