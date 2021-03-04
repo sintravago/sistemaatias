@@ -33,6 +33,7 @@ class ExtrasForm(forms.ModelForm):
         fields = ['entrada','salida','observacion','trabajador','user']
         widgets = {
             'observacion': forms.Textarea(attrs={'class':'form-control', 'placeholder':'Notas...', 'rows':'3'}),
+            'entrada': forms.TextInput(attrs={'class':'form-control datetimepicker-input', 'data-target':"#reservationdate"})
         }
 
 class TrabajadorForm(forms.ModelForm):

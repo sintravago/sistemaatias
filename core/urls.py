@@ -19,6 +19,7 @@ core_patterns = ([
     path('visitante/add', views.visitantesAdd, name ='visitante_add'),
     path('extras/add', views.ExtraCreateView.as_view(), name ='extras_add'),
     path('extras/search', views.ExtraListView.as_view(), name ='extras'),
+    path('extras/edit/<int:pk>', views.extrasUpdate.as_view(), name ='extras_edit'),
     path('visitantes', views.VisitasListView.as_view(), name ='visitas'),
 
 ], 'core')

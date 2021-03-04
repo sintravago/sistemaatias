@@ -51,7 +51,7 @@
                                     <td>{{ horas.entrada|date:"d/m/Y P" }}</td>
                                     <td>{{ horas.salida|date:"d/m/Y P" }}</td>
                                     <td>{{ horas.observacion }}</td>
-                                    <td>{{ horas.diferencia }}</td>
+                                    <td><a href="{% url 'core:extras_edit' horas.id %}">{{ horas.diferencia }}</a></td>
                                 </tr>
                             {% empty %}
                                 <tr>
