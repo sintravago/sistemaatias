@@ -40,6 +40,10 @@ class extras(models.Model):
         segundo = int(segundos % 60)
 
         return "{:02d}:{:02d}:{:02d}".format(horas,minutos,segundos)
+    
+    def segundos(self):
+        dif = (self.salida - self.entrada).total_seconds()
+        return dif
         
 
 class guardia(models.Model):
@@ -52,18 +56,26 @@ class guardia(models.Model):
     def __str__(self):
         return "{} - {}".format(self.entrada,self.salida)
 
+    def diferencia(self):
+        dif = (self.salida - self.entrada).total_seconds()
+        horas = int(dif // 3600)
+        segundos = int(dif % 3600)
+        minutos = int(segundos // 60)
+        segundo = int(segundos % 60)
+
+        return "{:02d}:{:02d}:{:02d}".format(horas,minutos,segundos)
+
+    def segundos(self):
+        dif = (self.salida - self.entrada).total_seconds()
+        return dif
+
 class marca(models.Model):
     tipo_marca = [
         ('E', 'Entrada'),
         ('S', 'Salida'),
     ]
-    modo_marca = [
-        ('R', 'Regular'),
-        ('G', 'Guardia'),
-    ]
     fecha = models.DateTimeField(auto_now_add=True, verbose_name='fecha')
     tipo = models.CharField(max_length=1, choices=tipo_marca, default='E')
-    modo = models.CharField(max_length=1, choices=modo_marca, default='R')
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     trabajador = models.ForeignKey(Trabajador, verbose_name="Trabajador", on_delete=models.PROTECT)
 

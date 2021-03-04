@@ -19,7 +19,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Horas Extras</h3>
+                    <h3 class="card-title">Guardias</h3>
                     
                     <div class="card-tools">
                         <div class="row">
@@ -65,7 +65,7 @@
                                     <td>{{ horas.entrada|date:"d/m/Y P" }}</td>
                                     <td>{{ horas.salida|date:"d/m/Y P" }}</td>
                                     <td>{{ horas.observacion }}</td>
-                                    <td><a href="{% url 'core:extras_edit' horas.id %}">{{ horas.diferencia }}</a></td>
+                                    <td><a href="{% url 'core:guardia_edit' horas.id %}">{{ horas.diferencia }}</a></td>
                                 </tr>
                             {% empty %}
                                 <tr>

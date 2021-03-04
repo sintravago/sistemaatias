@@ -1,0 +1,105 @@
+{% extends "core/base.html" %}
+{% block title %} Guardias {% endblock %}
+{% load static %}
+{% block titulo %} {% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Registrar Guardia </h3>
+  </div> 
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-6">  
+          <div class="form-group">
+            <label>Entrada:</label>
+              <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  <input id="id_entrada" name="entrada" type="text" class="form-control datetimepicker-input" data-target="#reservationdate" value={{ object.entrada|date:"d/m/YH:i:s" }} required />
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group" >
+            <label>Trabajador</label>
+            <select class="select2bs4" name="trabajador" id="id_trabajador" style="width: 100%;" required>
+              {% for tra in trabajadores %}
+                  <option value = {{tra.id }} {% if tra.id == object.trabajador.id %} selected {% endif %}>{{ tra.nombre }} {{ tra.apellido }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Salida:</label>
+              <div class="input-group date" id="reservationdatehasta" data-target-input="nearest">
+                  <input id="id_salida" name="salida" type="text" class="form-control datetimepicker-input" data-target="#reservationdatehasta" value={{ object.salida|date:"d/m/YH:i:s" }} required />
+                  <div class="input-group-append" data-target="#reservationdatehasta" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label> Observación </label>
+            <textarea class="form-control" rows="3" name="observacion" id="id_observacion" placeholder="...">{{ object.observacion}}</textarea>
+          </div>
+          <div class="btn-group float-right">
+            <input type="submit" class="btn btn-outline-success " name="Salida" id="Salida" value="Aceptar">
+          </div>
+        </div>
+        <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+    </form>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+{% endblock %}
+{% block script %}
+  <!-- bs-custom-file-input -->
+<script src="{% static 'core/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+  <script>
+    $(function () {
+      //Date range picker
+      $('.select2').select2();
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY HH:mm:ss'
+      });
+      $('#reservationdatehasta').datetimepicker({
+          format: 'DD/MM/YYYY HH:mm:ss'
+      });
+
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+    })      
+  </script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}

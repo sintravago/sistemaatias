@@ -76,10 +76,10 @@
                 <tbody>
                     {% for hora in object_list %}
                         <tr>
-                            <td> {{ hora.trabajador.get_profile.cedula}} </td>
-                            <td>{{ hora.trabajador.first_name}} {{ hora.trabajador.last_name}}</td>
-                            <td>{{ hora.trabajador.get_profile.cargo}}</td>
-                            <td>{{ hora.trabajador.get_profile.departamento}}</td>
+                            <td> {{ hora.trabajador.cedula}} </td>
+                            <td>{{ hora.trabajador.nombre}} {{ hora.trabajador.apelido}}</td>
+                            <td>{{ hora.trabajador.cargo}}</td>
+                            <td>{{ hora.trabajador.departamento}}</td>
                             <td>{{ hora.get_tipo_display }}</td>
                             <td> {{ hora.fecha|date:"d/m/Y" }}</td>
                             <td> {{ hora.fecha|date:"P" }}</td>
@@ -97,26 +97,30 @@
                         <th>Nombres y Apellidos</th>
                         <th>Cargo</th>
                         <th>Departamento</th>
-                        <th>Horas R.</th>
+                        <th>Marcadas</th>
+                        <th>Guardias</th>
+                        <th>Extras</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for hora in trabajadores %}
-                        {% if hora.tiempo > 0 %}
-                            <tr>
-                                <td> {{ hora.trabajador.cedula}} </td>
-                                <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
-                                <td>{{ hora.trabajador.cargo}}</td>
-                                <td>{{ hora.trabajador.departamento}}</td>
-                                <td>{% if hora.horas < 10 %}0{% endif %}{{ hora.horas }}:{% if hora.minutos < 10 %}0{% endif %}{{ hora.minutos }}:{% if hora.segundos < 10 %}0{% endif %}{{ hora.segundos }}</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td> {{ hora.trabajador.cedula}} </td>
+                            <td>{{ hora.trabajador.nombre}} {{ hora.trabajador.apellido}}</td>
+                            <td>{{ hora.trabajador.cargo}}</td>
+                            <td>{{ hora.trabajador.departamento}}</td>
+                            <td>{% if hora.horas < 10 %}0{% endif %}{{ hora.horas }}:{% if hora.minutos < 10 %}0{% endif %}{{ hora.minutos }}:{% if hora.segundos < 10 %}0{% endif %}{{ hora.segundos }}</td>
+                            <td>{% if hora.horasg < 10 %}0{% endif %}{{ hora.horasg }}:{% if hora.minutosg < 10 %}0{% endif %}{{ hora.minutosg }}:{% if hora.segundosg < 10 %}0{% endif %}{{ hora.segundosg }}</td>
+                            <td>{% if hora.horase < 10 %}0{% endif %}{{ hora.horase }}:{% if hora.minutose < 10 %}0{% endif %}{{ hora.minutose }}:{% if hora.segundose < 10 %}0{% endif %}{{ hora.segundose }}</td>
+                            <td>{{ hora.horast }}:{% if hora.minutost < 10 %}0{% endif %}{{ hora.minutost }}:{% if hora.segundost < 10 %}0{% endif %}{{ hora.segundost }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
                 
             </table>
 
-            <h3>Guardias Trabajadas</h3>
+            {% comment %} <h3>Guardias Trabajadas</h3>
             <table id="example2" class="table table-bordered table-striped">
                 <thead>
                     <tr>
@@ -129,18 +133,16 @@
                 </thead>
                 <tbody>
                     {% for hora in trabajadores %}
-                        {% if hora.gt > 0 %}
-                            <tr>
-                                <td> {{ hora.trabajador.cedula}} </td>
-                                <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
-                                <td>{{ hora.trabajador.cargo}}</td>
-                                <td>{{ hora.trabajador.departamento}}</td>
-                                <td>{% if hora.horasg < 10 %}0{% endif %}{{ hora.horasg }}:{% if hora.minutosg < 10 %}0{% endif %}{{ hora.minutosg }}:{% if hora.segundosg < 10 %}0{% endif %}{{ hora.segundosg }}</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td> {{ hora.trabajador.cedula}} </td>
+                            <td>{{ hora.trabajador.user.first_name}} {{ hora.trabajador.user.last_name}}</td>
+                            <td>{{ hora.trabajador.cargo}}</td>
+                            <td>{{ hora.trabajador.departamento}}</td>
+                            <td>{% if hora.horasg < 10 %}0{% endif %}{{ hora.horasg }}:{% if hora.minutosg < 10 %}0{% endif %}{{ hora.minutosg }}:{% if hora.segundosg < 10 %}0{% endif %}{{ hora.segundosg }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
-            </table>
+            </table> {% endcomment %}
 
             <h3>Permisos</h3>
             <table id="example2" class="table table-bordered table-striped">
@@ -159,15 +161,17 @@
                 <tbody>
                     {% for permiso in permisos %}
                         <tr>
-                            <td> {{ permiso.trabajador.get_profile.cedula}} </td>
-                            <td>{{ permiso.trabajador.first_name}} {{ hora.trabajador.last_name}}</td>
-                            <td>{{ permiso.trabajador.get_profile.cargo}}</td>
-                            <td>{{ permiso.trabajador.get_profile.departamento}}</td>
+                            <td> {{ permiso.trabajador.cedula}} </td>
+                            <td>{{ permiso.trabajador.nombre}} {{ permiso.trabajador.apellido}}</td>
+                            <td>{{ permiso.trabajador.cargo}}</td>
+                            <td>{{ permiso.trabajador.departamento}}</td>
                             <td>{{ permiso.get_motivo_display }}</td>
                             <td>{{ permiso.observacion }}</td>
-                            <td>{{ permiso.desde|date:"d/m/Y P" }} - {{ permiso.hasta|date:"d/m/Y P"}}</td>
+                            <td>{{ permiso.desde|date:"d/m/Y" }} - {{ permiso.hasta|date:"d/m/Y"}}</td>
                             <td>{% if permiso.archivo %}<a href="{{ permiso.archivo.url }}">ver</a>{% endif %}</td>
                         </tr>
+                        {% empty %}
+
                     {% endfor %}
                 </tbody>
                 

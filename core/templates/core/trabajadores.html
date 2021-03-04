@@ -80,10 +80,10 @@
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}
                         <li class="paginate_button page-item first">
-                            <a class="page-link" href="?page=1">&laquo; Primera</a>
+                            <a class="page-link" href="?page=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">&laquo; Primera</a>
                         </li>
                         <li class="paginate_button page-item previous">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Anterior</a>
                         </li>
                         {% endif %}
                         
@@ -93,10 +93,10 @@
 
                         {% if page_obj.has_next %}
                         <li class="paginate_button page-item next">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Siguiente</a>
                         </li>
                         <li class="paginate_button page-item last">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Ultima &raquo;</a>
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Ultima &raquo;</a>
                         </li>
                         {% endif %}
                     </ul>

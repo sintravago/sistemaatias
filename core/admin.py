@@ -6,7 +6,7 @@ class permisosAdmin(admin.ModelAdmin):
     list_display = ('desde','hasta','trabajador','motivo')
 
 class marcaAdmin(admin.ModelAdmin):
-    list_display = ('fecha','tipo','modo','trabajador')
+    list_display = ('fecha','tipo','trabajador')
 
 class guardiaAdmin(admin.ModelAdmin):
     list_display = ('trabajador','entrada','salida')

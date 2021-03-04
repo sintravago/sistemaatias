@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import MarcarForm, VisitarntesForm, PermisosForm, ExtrasForm, TrabajadorForm
+from .forms import MarcarForm, VisitarntesForm, PermisosForm, ExtrasForm, TrabajadorForm, GuardiaForm
 from registration.models import Trabajador, horario, departamento, cargo, horario
 from .models import marca, guardia, permisos, visitantes, extras
 from django.views.generic.list import ListView
@@ -151,11 +151,16 @@ class PermisosListView(ListView):
                 permiso = self.request.GET['permisos']
                 if permiso != "0":
                     object_list = object_list.filter(motivo=permiso)
+            if "departamento" in self.request.GET:
+                depart = self.request.GET['departamento']
+                if depart != "0":
+                    object_list = object_list.filter(trabajador__departamento__id = depart)
         return object_list
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['permisos'] = permisos.tipo_permiso
+        context['departamentos'] = departamento.objects.all()
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -210,7 +215,16 @@ class ExtraListView(ListView):
                             object_list = object_list.filter(Q(trabajador__nombre__icontains = x) | Q(trabajador__apellido__icontains = x))
                     else:
                         object_list = object_list.filter(Q(trabajador__nombre__icontains = name) | Q(trabajador__apellido__icontains = name) | Q(trabajador__cedula__icontains = name))
+            if "departamento" in self.request.GET:
+                depart = self.request.GET["departamento"]
+                if depart != "0":
+                    object_list = object_list.filter(trabajador__departamento__id = depart)
         return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departamentos'] = departamento.objects.all()
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class extrasUpdate(UpdateView):
@@ -226,6 +240,63 @@ class extrasUpdate(UpdateView):
     
     def get_success_url(self):
         return reverse_lazy("core:extras")
+
+@method_decorator(login_required, name='dispatch')
+class GuardiaCreateView(CreateView):
+    form_class = GuardiaForm 
+    template_name = 'core/guardia_add.html'
+    success_url = reverse_lazy("core:guardia_add")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tra = Trabajador.objects.all()
+        context["trabajadores"] = tra
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class GuardiasListView(ListView):
+    model = guardia
+    template_name = 'core/guardias.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.all()
+        
+        if self.request.method == "GET":
+            if "search" in self.request.GET:
+                name = self.request.GET['search']
+                if (name != ''):
+                    if len(name.split()) > 1:
+                        for x in name.split():
+                            object_list = object_list.filter(Q(trabajador__nombre__icontains = x) | Q(trabajador__apellido__icontains = x))
+                    else:
+                        object_list = object_list.filter(Q(trabajador__nombre__icontains = name) | Q(trabajador__apellido__icontains = name) | Q(trabajador__cedula__icontains = name))
+            
+            if "departamento" in self.request.GET:
+                depart = self.request.GET["departamento"]
+                if depart != "0":
+                    object_list = object_list.filter(trabajador__departamento__id = depart)
+        return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departamentos'] = departamento.objects.all()
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class GuardiaUpdate(UpdateView):
+    form_class = GuardiaForm
+    model = guardia
+    template_name = 'core/guardia_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tra = Trabajador.objects.all()
+        context["trabajadores"] = tra
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy("core:guardias")
 
 @method_decorator(login_required, name='dispatch')
 class HoyListView(ListView):
@@ -246,56 +317,84 @@ def diarioView(request):
         hasta = hasta.strip(' ')
         desde = datetime.strptime(desde, '%d/%m/%Y')
         hasta = datetime.strptime(hasta, '%d/%m/%Y')
-        print(desde.strftime('%Y-%m-%d 00:00:01'))
-        print(hasta.strftime('%Y-%m-%d 23:59:59'))
-        p = permisos.objects.filter(Q(desde__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))) | Q(hasta__range = (desde.strftime('%Y-%m-%d 00:00:01'),hasta.strftime('%Y-%m-%d 23:59:59'))))
-        result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:0'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        per = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d'),hasta__lte = hasta.strftime('%Y-%m-%d'))
+        horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         if request.POST['departamento'] != "0":
-            result = result.filter(trabajador__departamento = request.POST['departamento'])
+            horas = horas.filter(trabajador__departamento = request.POST['departamento'])
+            per = permisos.filter(trabajador__departamento = request.POST['departamento'])
+            guar = guardia.filter(trabajador__departamento = request.POST['departamento'])
+            extra = extras.filter(trabajador__departamento = request.POST['departamento'])
+
     else:
         hoy = datetime.now()
-        desde = hoy.strftime("%Y-%m-%d 00:00:00")
-        hasta = hoy.strftime("%Y-%m-%d 23:59:59")
-        result = marca.objects.filter(fecha__gte = desde,fecha__lte = hasta)
-        p = permisos.objects.filter(hasta__lte = hasta )
-    
-    
+        desde = hoy.strftime("%Y-%m-%d")
+        hasta = hoy.strftime("%Y-%m-%d")
+        inicio = hoy.strftime("%Y-%m-%d 00:00:00")
+        fin = hoy.strftime("%Y-%m-%d 23:59:59")
+        horas = marca.objects.filter(fecha__gte = inicio,fecha__lte = fin)
+        per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
+        guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
+        extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
+
     for trabajador in trabajadores:
-        if result.filter(trabajador = trabajador.user).exists():
-            results = result.filter(trabajador = trabajador.user)
-            tiene_g = False
-            if guardia.objects.filter(trabajador=trabajador.user).exists():
-                g = guardia.objects.filter(trabajador=trabajador.user)
-                tiene_g = True
+        tiempo = 0
+        if horas.filter(trabajador = trabajador).exists():
+            results = horas.filter(trabajador = trabajador)
             total = results.count()
-            if total > 1:
-                if total % 2 != 0:
-                    total -= 1
-                i = 0
-                tiempo = 0
-                gt = 0
-                while(i < total):
-                    if tiene_g:
-                        if g.count() > 0:
-                            for j in g:
-                                if j.entrada.date() == results[i+1].fecha.date():
-                                    gt += (results[i].fecha - results[i+1].fecha).total_seconds()
-                    tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
-                    i += 2
-                tiempo -= gt
-                list_t['tiempo'] = tiempo
-                list_t['trabajador'] = trabajador
-                list_t['horas'] = int(tiempo // 3600)
-                list_t['segundos'] = int(tiempo % 3600)
-                list_t['minutos'] = int(list_t['segundos'] // 60)
-                list_t['segundos'] = int(list_t['segundos'] % 60)
-                list_t['gt'] = gt
-                list_t['horasg'] = int(gt // 3600)
-                list_t['segundosg'] = int(gt % 3600)
-                list_t['minutosg'] = int(list_t['segundosg'] // 60)
-                list_t['segundosg'] = int(list_t['segundosg'] % 60)
-                list_tt.append(list_t.copy())
-    return render(request,'core/diario.html',{'object_list':result,'departamento':dep,'trabajadores':list_tt, 'permisos':p})
+            if total > 0:
+                if total+1 % 2 != 0:
+                    i = 0
+                    while(i < total):
+                        tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
+                        i += 2
+        tguar = 0
+        if  guar.filter(trabajador = trabajador).exists():
+            results = guar.filter(trabajador = trabajador)
+            for result in results:
+                tguar += (result.salida - result.entrada).total_seconds()
+
+        textra = 0
+        if extra.filter(trabajador = trabajador).exists():
+            results = extra.filter(trabajador = trabajador)
+            for result in results:
+                textra += (result.salida - result.entrada).total_seconds()
+
+        if tguar + textra > tiempo:
+            ttotal =  (tguar + textra) - tiempo
+        else:
+            ttotal =  tiempo - (tguar + textra) 
+
+
+        list_t['tiempo'] = tiempo
+        list_t['trabajador'] = trabajador
+        list_t['horas'] = int(tiempo // 3600)
+        list_t['segundos'] = int(tiempo % 3600)
+        list_t['minutos'] = int(list_t['segundos'] // 60)
+        list_t['segundos'] = int(list_t['segundos'] % 60)
+
+        list_t['horasg'] = int(tguar // 3600)
+        list_t['segundosg'] = int(tguar % 3600)
+        list_t['minutosg'] = int(list_t['segundosg'] // 60)
+        list_t['segundosg'] = int(list_t['segundosg'] % 60)
+
+        list_t['horase'] = int(textra // 3600)
+        list_t['segundose'] = int(textra % 3600)
+        list_t['minutose'] = int(list_t['segundose'] // 60)
+        list_t['segundose'] = int(list_t['segundose'] % 60)
+
+        list_t['horast'] = int(ttotal // 3600)
+        if tguar + textra > tiempo:
+            list_t['horast'] *= -1
+        list_t['segundost'] = int(ttotal % 3600)
+        list_t['minutost'] = int(list_t['segundost'] // 60)
+        list_t['segundost'] = int(list_t['segundost'] % 60)
+        
+
+        list_tt.append(list_t.copy())
+
+    return render(request,'core/diario.html',{'object_list':horas,'departamento':dep,'trabajadores':list_tt, 'permisos':per})
 
 @login_required        
 def fechaView(request):
@@ -342,71 +441,96 @@ class ReportePDFView(PDFTemplateView):
         trabajadores = Trabajador.objects.all()
         list_t = {}
         list_tt = []
-        fecha = 0
         depa = "Todos"
-        if "fecha" in self.request.GET:
+        if self.request.GET:
             fecha = self.request.GET['fecha']
             desde, hasta = self.request.GET['fecha'].split('-')
             desde = desde.strip(' ')
             hasta = hasta.strip(' ')
             desde = datetime.strptime(desde, '%d/%m/%Y')
             hasta = datetime.strptime(hasta, '%d/%m/%Y')
-            p = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d 00:00:00'), hasta__lte = hasta.strftime('%Y-%m-%d 23:59:59') )
-            result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+            per = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d'),hasta__lte = hasta.strftime('%Y-%m-%d'))
+            horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+            guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+            extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
             if self.request.GET['departamento'] != "0":
-                depa = departamento.objects.get(pk = self.request.GET['departamento']).nombre
-                result = result.filter(trabajador__get_profile__departamento = self.request.GET['departamento'])
+                horas = horas.filter(trabajador__departamento = self.request.POST['departamento'])
+                per = permisos.filter(trabajador__departamento = self.request.POST['departamento'])
+                guar = guardia.filter(trabajador__departamento = self.request.POST['departamento'])
+                extra = extras.filter(trabajador__departamento = self.request.POST['departamento'])
+                depa = departamento.objects.get(id=self.request.GET['departamento']).nombre
         else:
             hoy = datetime.now()
-            desde = hoy.strftime("%Y-%m-%d 00:00:00")
-            hasta = hoy.strftime("%Y-%m-%d 23:59:59")
-            result = marca.objects.filter(fecha__gte = desde,fecha__lte = hasta)
-            p = permisos.objects.filter(desde__gte = desde, hasta__lte = hasta )
-        
-        
+            fecha = hoy.strftime("%d/%m/%Y")
+            desde = hoy.strftime("%Y-%m-%d")
+            hasta = hoy.strftime("%Y-%m-%d")
+            inicio = hoy.strftime("%Y-%m-%d 00:00:00")
+            fin = hoy.strftime("%Y-%m-%d 23:59:59")
+            horas = marca.objects.filter(fecha__gte = inicio,fecha__lte = fin)
+            per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
+            guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
+            extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
+
         for trabajador in trabajadores:
-            if result.filter(trabajador = trabajador.user).exists():
-                results = result.filter(trabajador = trabajador.user)
-                tiene_g = False
-                if guardia.objects.filter(trabajador=trabajador.user).exists():
-                    g = guardia.objects.filter(trabajador=trabajador.user)
-                    tiene_g = True
+            tiempo = 0
+            if horas.filter(trabajador = trabajador).exists():
+                results = horas.filter(trabajador = trabajador)
                 total = results.count()
-                if total > 1:
-                    if total % 2 != 0:
-                        total -= 1
-                    i = 0
-                    tiempo = 0
-                    gt = 0
-                    while(i < total):
-                        if tiene_g:
-                            if g.count() > 0:
-                                for j in g:
-                                    if j.entrada.date() == results[i+1].fecha.date():
-                                        gt += (results[i].fecha - results[i+1].fecha).total_seconds()
-                        tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
-                        i += 2
-                    tiempo -= gt
-                    list_t['tiempo'] = tiempo
-                    list_t['trabajador'] = trabajador
-                    list_t['horas'] = int(tiempo // 3600)
-                    list_t['segundos'] = int(tiempo % 3600)
-                    list_t['minutos'] = int(list_t['segundos'] // 60)
-                    list_t['segundos'] = int(list_t['segundos'] % 60)
-                    list_t['gt'] = gt
-                    list_t['horasg'] = int(gt // 3600)
-                    list_t['segundosg'] = int(gt % 3600)
-                    list_t['minutosg'] = int(list_t['segundosg'] // 60)
-                    list_t['segundosg'] = int(list_t['segundosg'] % 60)
-                    list_tt.append(list_t.copy())
+                if total > 0:
+                    if total+1 % 2 != 0:
+                        i = 0
+                        while(i < total):
+                            tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
+                            i += 2
+            tguar = 0
+            if  guar.filter(trabajador = trabajador).exists():
+                results = guar.filter(trabajador = trabajador)
+                for result in results:
+                    tguar += (result.salida - result.entrada).total_seconds()
+
+            textra = 0
+            if extra.filter(trabajador = trabajador).exists():
+                results = extra.filter(trabajador = trabajador)
+                for result in results:
+                    textra += (result.salida - result.entrada).total_seconds()
+            if tguar + textra > tiempo:
+                ttotal =  ((tguar + textra) - tiempo )
+            else:
+                ttotal =  tiempo - (tguar + textra) 
+        
+            list_t['tiempo'] = tiempo
+            list_t['trabajador'] = trabajador
+            list_t['horas'] = int(tiempo // 3600)
+            list_t['segundos'] = int(tiempo % 3600)
+            list_t['minutos'] = int(list_t['segundos'] // 60)
+            list_t['segundos'] = int(list_t['segundos'] % 60)
+
+            list_t['horasg'] = int(tguar // 3600)
+            list_t['segundosg'] = int(tguar % 3600)
+            list_t['minutosg'] = int(list_t['segundosg'] // 60)
+            list_t['segundosg'] = int(list_t['segundosg'] % 60)
+
+            list_t['horase'] = int(textra // 3600)
+            list_t['segundose'] = int(textra % 3600)
+            list_t['minutose'] = int(list_t['segundose'] // 60)
+            list_t['segundose'] = int(list_t['segundose'] % 60)
+
+            list_t['horast'] = int(ttotal // 3600)
+            if tguar + textra > tiempo:
+                 list_t['horast'] *= -1
+            list_t['segundost'] = int(ttotal % 3600)
+            list_t['minutost'] = int(list_t['segundost'] // 60)
+            list_t['segundost'] = int(list_t['segundost'] % 60)
+            
+
+            list_tt.append(list_t.copy())
         return super(ReportePDFView, self).get_context_data(
             departamento = depa,
             fecha = fecha,
-            permisos=p,
-            object_list=result,
+            object_list=horas,
             trabajadores=list_tt,
             pagesize='letter',
-            title='Presupuesto',
+            title='Reporte',
             **kwargs
         )
 
@@ -423,53 +547,82 @@ def exportarhora(request):
         hasta = hasta.strip(' ')
         desde = datetime.strptime(desde, '%d/%m/%Y')
         hasta = datetime.strptime(hasta, '%d/%m/%Y')
-        p = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d 00:00:00'), hasta__lte = hasta.strftime('%Y-%m-%d 23:59:59') )
-        result = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        per = permisos.objects.filter(desde__gte = desde.strftime('%Y-%m-%d'),hasta__lte = hasta.strftime('%Y-%m-%d'))
+        horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
+        extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         if request.POST['departamento'] != "0":
-            result = result.filter(trabajador__departamento = request.POST['departamento'])
+            horas = horas.filter(trabajador__departamento = request.POST['departamento'])
+            per = permisos.filter(trabajador__departamento = request.POST['departamento'])
+            guar = guardia.filter(trabajador__departamento = request.POST['departamento'])
+            extra = extras.filter(trabajador__departamento = request.POST['departamento'])
+
     else:
         hoy = datetime.now()
-        desde = hoy.strftime("%Y-%m-%d 00:00:00")
-        hasta = hoy.strftime("%Y-%m-%d 23:59:59")
-        result = marca.objects.filter(fecha__gte = desde,fecha__lte = hasta)
-        p = permisos.objects.filter(desde__gte = desde, hasta__lte = hasta )
-    
-    
+        desde = hoy.strftime("%Y-%m-%d")
+        hasta = hoy.strftime("%Y-%m-%d")
+        inicio = hoy.strftime("%Y-%m-%d 00:00:00")
+        fin = hoy.strftime("%Y-%m-%d 23:59:59")
+        horas = marca.objects.filter(fecha__gte = inicio,fecha__lte = fin)
+        per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
+        guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
+        extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
+
     for trabajador in trabajadores:
-        if result.filter(trabajador = trabajador.user).exists():
-            results = result.filter(trabajador = trabajador.user)
-            tiene_g = False
-            if guardia.objects.filter(trabajador=trabajador.user).exists():
-                g = guardia.objects.filter(trabajador=trabajador.user)
-                tiene_g = True
+        tiempo = 0
+        if horas.filter(trabajador = trabajador).exists():
+            results = horas.filter(trabajador = trabajador)
             total = results.count()
-            if total > 1:
-                if total % 2 != 0:
-                    total -= 1
-                i = 0
-                tiempo = 0
-                gt = 0
-                while(i < total):
-                    if tiene_g:
-                        if g.count() > 0:
-                            for j in g:
-                                if j.entrada.date() == results[i+1].fecha.date():
-                                    gt += (results[i].fecha - results[i+1].fecha).total_seconds()
-                    tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
-                    i += 2
-                tiempo -= gt
-                list_t['tiempo'] = tiempo
-                list_t['trabajador'] = trabajador
-                list_t['horas'] = int(tiempo // 3600)
-                list_t['segundos'] = int(tiempo % 3600)
-                list_t['minutos'] = int(list_t['segundos'] // 60)
-                list_t['segundos'] = int(list_t['segundos'] % 60)
-                list_t['gt'] = gt
-                list_t['horasg'] = int(gt // 3600)
-                list_t['segundosg'] = int(gt % 3600)
-                list_t['minutosg'] = int(list_t['segundosg'] // 60)
-                list_t['segundosg'] = int(list_t['segundosg'] % 60)
-                list_tt.append(list_t.copy())
+            if total > 0:
+                if total+1 % 2 != 0:
+                    i = 0
+                    while(i < total):
+                        tiempo += (results[i].fecha - results[i+1].fecha).total_seconds()
+                        i += 2
+        tguar = 0
+        if  guar.filter(trabajador = trabajador).exists():
+            results = guar.filter(trabajador = trabajador)
+            for result in results:
+                tguar += (result.salida - result.entrada).total_seconds()
+
+        textra = 0
+        if extra.filter(trabajador = trabajador).exists():
+            results = extra.filter(trabajador = trabajador)
+            for result in results:
+                textra += (result.salida - result.entrada).total_seconds()
+
+        if tguar + textra > tiempo:
+            ttotal =  (tguar + textra) - tiempo
+        else:
+            ttotal =  tiempo - (tguar + textra) 
+
+
+        list_t['tiempo'] = tiempo
+        list_t['trabajador'] = trabajador
+        list_t['horas'] = int(tiempo // 3600)
+        list_t['segundos'] = int(tiempo % 3600)
+        list_t['minutos'] = int(list_t['segundos'] // 60)
+        list_t['segundos'] = int(list_t['segundos'] % 60)
+
+        list_t['horasg'] = int(tguar // 3600)
+        list_t['segundosg'] = int(tguar % 3600)
+        list_t['minutosg'] = int(list_t['segundosg'] // 60)
+        list_t['segundosg'] = int(list_t['segundosg'] % 60)
+
+        list_t['horase'] = int(textra // 3600)
+        list_t['segundose'] = int(textra % 3600)
+        list_t['minutose'] = int(list_t['segundose'] // 60)
+        list_t['segundose'] = int(list_t['segundose'] % 60)
+
+        list_t['horast'] = int(ttotal // 3600)
+        if tguar + textra > tiempo:
+            list_t['horast'] *= -1
+        list_t['segundost'] = int(ttotal % 3600)
+        list_t['minutost'] = int(list_t['segundost'] // 60)
+        list_t['segundost'] = int(list_t['segundost'] % 60)
+        
+
+        list_tt.append(list_t.copy())
     export = []
     # Se agregan los encabezados de las columnas
     export.append([
@@ -481,15 +634,15 @@ def exportarhora(request):
         'Fecha',
         'Hora',
     ])
-    for hora in result:
+    for hora in horas:
         export.append([
             hora.trabajador.cedula,
-            "{} {}".format(hora.trabajador.first_name,hora.trabajador.last_name),
+            "{} {}".format(hora.trabajador.nombre,hora.trabajador.apellido),
             hora.trabajador.cargo.nombre,
             hora.trabajador.departamento.nombre,
             hora.get_tipo_display(),
             "{:%d/%m/%Y}".format(hora.fecha),
-            "{:%I:%M:%S %P}".format(hora.fecha),
+            "{:%I:%M:%S}".format(hora.fecha),
         ])
     export.append([])
     
@@ -498,18 +651,22 @@ def exportarhora(request):
         'Nombre y Apellido',
         'Cargo',
         'Departamento',
-        'Horas TR',
-        'Horas TG',
+        'Marcadas',
+        'Guardias',
+        'Extras',
+        'Total',
     ])
 
     for hora in list_tt:
         export.append([
             hora['trabajador'].cedula,
-            "{} {}".format(hora['trabajador'].user.first_name,hora['trabajador'].user.last_name),
-            hora['trabajador'].cargo,
+            "{} {}".format(hora['trabajador'].nombre,hora['trabajador'].apellido),
+            hora['trabajador'].cargo.nombre,
             hora['trabajador'].departamento.nombre,
             "{:02d}:{:02d}:{:02d}".format(hora['horas'],hora['minutos'],hora['segundos']),
             "{:02d}:{:02d}:{:02d}".format(hora['horasg'],hora['minutosg'],hora['segundosg']),
+            "{:02d}:{:02d}:{:02d}".format(hora['horase'],hora['minutose'],hora['segundose']),
+            "{:02d}:{:02d}:{:02d}".format(hora['horast'],hora['minutost'],hora['segundost']),
         ])
     export.append([])
         # ejemplo para dar formato a fechas, estados (si/no, ok/fail) o
@@ -526,10 +683,10 @@ def exportarhora(request):
         'Fecha',
     ])
 
-    for permiso in p:
+    for permiso in per:
         export.append([
             permiso.trabajador.cedula,
-            "{} {}".format(permiso.trabajador.first_name,permiso.trabajador.last_name),
+            "{} {}".format(permiso.trabajador.nombre,permiso.trabajador.apellido),
             permiso.trabajador.cargo.nombre,
             permiso.trabajador.departamento.nombre,
             permiso.get_motivo_display(),

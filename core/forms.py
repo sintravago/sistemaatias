@@ -1,5 +1,5 @@
 from django import forms
-from .models import visitantes, permisos, extras
+from .models import visitantes, permisos, extras, guardia
 from registration.models import Trabajador
 
 class MarcarForm(forms.Form):
@@ -26,6 +26,15 @@ class PermisosForm(forms.ModelForm):
             'motivo': forms.Select(attrs={'class':'form-control'}),
         }
 
+
+class GuardiaForm(forms.ModelForm):
+    class Meta:
+        model = guardia
+        fields = ['entrada','salida','observacion','trabajador','user']
+        widgets = {
+            'observacion': forms.Textarea(attrs={'class':'form-control', 'placeholder':'Notas...', 'rows':'3'}),
+            'entrada': forms.TextInput(attrs={'class':'form-control datetimepicker-input', 'data-target':"#reservationdate"})
+        }
 
 class ExtrasForm(forms.ModelForm):
     class Meta:
