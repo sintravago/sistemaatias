@@ -56,7 +56,7 @@ class Trabajador(models.Model):
     tlf2 = models.CharField(max_length=50 , verbose_name='Teléfono 2', null = True, blank = True)
     horario = models.ForeignKey(horario, verbose_name="Horario", on_delete=models.CASCADE)
     estatus = models.CharField(max_length=1, choices=choise_estatus, default='A',)
-	email = models.EmailField(verbose_name='Email', null = True, blank = True)
+    email = models.EmailField(verbose_name='Email', null = True, blank = True)
 
     def __str__(self):
         return (self.nombre + ' ' + self.apellido)
