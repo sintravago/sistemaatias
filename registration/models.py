@@ -46,7 +46,7 @@ class Trabajador(models.Model):
 	
     nombre = models.CharField(max_length=100 , verbose_name='Nombre')
     apellido = models.CharField(max_length=100 , verbose_name='Apellido')
-    codigo = models.IntegerField(verbose_name='Código', null=True, blank=True)
+    codigo = models.CharField(max_length=100, verbose_name='Código', null=True, blank=True)
     cedula = models.IntegerField(verbose_name='Cédula')
     cargo = models.ForeignKey(cargo, verbose_name="Cargo", on_delete=models.CASCADE)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.CASCADE)
