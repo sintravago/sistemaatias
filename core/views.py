@@ -66,7 +66,7 @@ class TrabajadoresListView(ListView):
 
     def get_queryset(self):
         object_list = self.model.objects.all()
-        
+        object_list = object_list.filter(departamento = self.request.user.get_departamento.all())
         if self.request.method == "GET":
             if "search" in self.request.GET:
                 name = self.request.GET['search']

@@ -99,3 +99,9 @@ class visitantes(models.Model):
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_v")
+
+class Supervisor(models.Model):
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user")
+    departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT, related_name="get_departamento")
+
+
