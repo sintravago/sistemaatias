@@ -23,17 +23,19 @@
                     
                     <div class="card-tools">
                         <div class="row">
-                            <div class = "col-4">
-                                <div class="input-group" style="width: 300px;">
-                                    <select class="select2bs4" name="departamento" id="departamento" required>
-                                    <option value = "0">Todos</option>
-                                    {% for dep in departamentos %}
-                                        <option value = {{dep.pk}} {% if dep.pk|floatformat == request.GET.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
-                                    {% endfor %}
-                                    </select>
+                            {%if request.user.is_staff %}
+                                <div class = "col-4">
+                                    <div class="input-group" style="width: 300px;">
+                                        <select class="select2bs4" name="departamento" id="departamento" required>
+                                        <option value = "0">Todos</option>
+                                        {% for dep in departamentos %}
+                                            <option value = {{dep.pk}} {% if dep.pk|floatformat == request.GET.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class = "col-4">
+                            {% endif %}
+                            <div class = "col-{%if request.user.is_staff %}4{% else %}6{%endif%}">
                                 <div class="input-group" style="width: 300px;">
                                     <select class="select2bs4" name="permisos" id="permisos" required>
                                     <option value = "0" >Todos</option>

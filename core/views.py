@@ -65,8 +65,10 @@ class TrabajadoresListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.all()
-        object_list = object_list.filter(departamento = self.request.user.get_departamento.all())
+        if self.request.user.is_staff:
+            object_list = self.model.objects.all()
+        else:
+            object_list = self.model.objects.filter(departamento=self.request.user.get_user_d.first().departamento)
         if self.request.method == "GET":
             if "search" in self.request.GET:
                 name = self.request.GET['search']
@@ -136,7 +138,10 @@ class PermisosListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.all()
+        if self.request.user.is_staff:
+            object_list = self.model.objects.all()
+        else:
+            object_list = self.model.objects.filter(trabajador__departamento=self.request.user.get_user_d.first().departamento)
         
         if self.request.method == "GET":
             if "search" in self.request.GET:
@@ -204,7 +209,10 @@ class ExtraListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.all()
+        if self.request.user.is_staff:
+            object_list = self.model.objects.all()
+        else:
+            object_list = self.model.objects.filter(trabajador__departamento=self.request.user.get_user_d.first().departamento)
         
         if self.request.method == "GET":
             if "search" in self.request.GET:
@@ -260,7 +268,10 @@ class GuardiasListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.all()
+        if self.request.user.is_staff:
+            object_list = self.model.objects.all()
+        else:
+            object_list = self.model.objects.filter(trabajador__departamento=self.request.user.get_user_d.first().departamento)
         
         if self.request.method == "GET":
             if "search" in self.request.GET:
@@ -307,8 +318,13 @@ class HoyListView(ListView):
 
 @login_required
 def diarioView(request):
-    dep = departamento.objects.all()
-    trabajadores = Trabajador.objects.all()
+    if request.user.is_staff:
+        dep = departamento.objects.all()
+        trabajadores = Trabajador.objects.all()
+    else:
+        dep = departamento.objects.filter(pk=request.user.get_user_d.first().departamento.pk)
+        trabajadores = Trabajador.objects.filter(departamento=request.user.get_user_d.first().departamento)
+    
     list_t = {}
     list_tt = []
     if request.POST:
@@ -321,11 +337,17 @@ def diarioView(request):
         horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
-        if request.POST['departamento'] != "0":
-            horas = horas.filter(trabajador__departamento = request.POST['departamento'])
-            per = permisos.filter(trabajador__departamento = request.POST['departamento'])
-            guar = guardia.filter(trabajador__departamento = request.POST['departamento'])
-            extra = extras.filter(trabajador__departamento = request.POST['departamento'])
+        if request.user.is_staff:
+            if request.POST['departamento'] != "0":
+                horas = horas.filter(trabajador__departamento = request.POST['departamento'])
+                per = per.filter(trabajador__departamento = request.POST['departamento'])
+                guar = guar.filter(trabajador__departamento = request.POST['departamento'])
+                extra = extra.filter(trabajador__departamento = request.POST['departamento'])
+        else:
+            horas = horas.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            per = per.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            guar = guar.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            extra = extra.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
 
     else:
         hoy = datetime.now()
@@ -337,7 +359,11 @@ def diarioView(request):
         per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
         guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
         extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
-
+        if not request.user.is_staff:
+            horas = horas.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            per = per.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            guar = guar.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            extra = extra.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
     for trabajador in trabajadores:
         tiempo = 0
         if horas.filter(trabajador = trabajador).exists():
@@ -453,12 +479,19 @@ class ReportePDFView(PDFTemplateView):
             horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
             guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
             extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
-            if self.request.GET['departamento'] != "0":
-                horas = horas.filter(trabajador__departamento = self.request.POST['departamento'])
-                per = permisos.filter(trabajador__departamento = self.request.POST['departamento'])
-                guar = guardia.filter(trabajador__departamento = self.request.POST['departamento'])
-                extra = extras.filter(trabajador__departamento = self.request.POST['departamento'])
-                depa = departamento.objects.get(id=self.request.GET['departamento']).nombre
+            if self.request.user.is_staff:
+                if self.request.POST['departamento'] != "0":
+                    horas = horas.filter(trabajador__departamento = self.request.POST['departamento'])
+                    per = per.filter(trabajador__departamento = self.request.POST['departamento'])
+                    guar = guar.filter(trabajador__departamento = self.request.POST['departamento'])
+                    extra = extra.filter(trabajador__departamento = self.request.POST['departamento'])
+                    depa = departamento.objects.get(id=self.request.GET['departamento']).nombre
+            else:
+                horas = horas.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                per = per.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                guar = guar.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                extra = extra.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                depa = departamento.objects.get(pk=self.request.user.get_user_d.first().departamento.pk).nombre
         else:
             hoy = datetime.now()
             fecha = hoy.strftime("%d/%m/%Y")
@@ -470,6 +503,11 @@ class ReportePDFView(PDFTemplateView):
             per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
             guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
             extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
+            if not self.request.user.is_staff:
+                horas = horas.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                per = per.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                guar = guar.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
+                extra = extra.filter(trabajador__departamento = self.request.user.get_user_d.first().departamento)
 
         for trabajador in trabajadores:
             tiempo = 0
@@ -537,8 +575,12 @@ class ReportePDFView(PDFTemplateView):
 @login_required
 def exportarhora(request):
     # Obtenemos la fecha para agregarla al nombre del archivo
-    dep = departamento.objects.all()
-    trabajadores = Trabajador.objects.all()
+    if request.user.is_staff:
+        dep = departamento.objects.all()
+        trabajadores = Trabajador.objects.all()
+    else:
+        dep = departamento.objects.filter(pk=request.user.get_user_d.first().departamento.pk)
+        trabajadores = Trabajador.objects.filter(departamento=request.user.get_user_d.first().departamento)
     list_t = {}
     list_tt = []
     if request.POST:
@@ -551,11 +593,17 @@ def exportarhora(request):
         horas = marca.objects.filter(fecha__gte = desde.strftime('%Y-%m-%d 00:00:00'),fecha__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         guar = guardia.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
         extra = extras.objects.filter(entrada__gte = desde.strftime('%Y-%m-%d 00:00:00'), salida__lte = hasta.strftime('%Y-%m-%d 23:59:59'))
-        if request.POST['departamento'] != "0":
-            horas = horas.filter(trabajador__departamento = request.POST['departamento'])
-            per = permisos.filter(trabajador__departamento = request.POST['departamento'])
-            guar = guardia.filter(trabajador__departamento = request.POST['departamento'])
-            extra = extras.filter(trabajador__departamento = request.POST['departamento'])
+        if request.user.is_staff:
+            if request.POST['departamento'] != "0":
+                horas = horas.filter(trabajador__departamento = request.POST['departamento'])
+                per = per.filter(trabajador__departamento = request.POST['departamento'])
+                guar = guar.filter(trabajador__departamento = request.POST['departamento'])
+                extra = extra.filter(trabajador__departamento = request.POST['departamento'])
+        else:
+            horas = horas.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            per = per.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            guar = guar.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            extra = extra.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
 
     else:
         hoy = datetime.now()
@@ -567,6 +615,11 @@ def exportarhora(request):
         per = permisos.objects.filter(desde__gte = desde,hasta__lte = hasta )
         guar = guardia.objects.filter(entrada__gte = inicio, salida__lte = fin)
         extra = extras.objects.filter(entrada__gte = inicio, salida__lte = fin)
+        if not request.user.is_staff:
+            horas = horas.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            per = per.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            guar = guar.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
+            extra = extra.filter(trabajador__departamento = request.user.get_user_d.first().departamento)
 
     for trabajador in trabajadores:
         tiempo = 0

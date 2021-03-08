@@ -101,7 +101,7 @@ class visitantes(models.Model):
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_v")
 
 class Supervisor(models.Model):
-    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user")
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_d")
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT, related_name="get_departamento")
 
 
