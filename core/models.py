@@ -98,7 +98,7 @@ class visitantes(models.Model):
     tipo = models.CharField(max_length=1, verbose_name="Tipo", choices=tipo_marca, default='E')
     observacion = models.TextField(verbose_name="Observaciones", blank=True, null=True)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
-    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_v")
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_v", blank=True, null=True)
 
 class Supervisor(models.Model):
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT, related_name="get_user_d")
