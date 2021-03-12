@@ -20,7 +20,7 @@ def marcar(request):
     if request.method == 'POST':
         form = MarcarForm(request.POST)
         if form.is_valid():
-			form2 = MarcarForm()
+		    form2 = MarcarForm()
             if (Trabajador.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
                 
                 trabajador = Trabajador.objects.get(cedula=form.cleaned_data['barcode'])
