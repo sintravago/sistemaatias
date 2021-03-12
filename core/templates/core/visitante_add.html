@@ -74,7 +74,9 @@
           </div>
         </div>
       </div>
-      <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+	  {% if request.user.is_authenticated %}
+		<input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+	  {% endif %}
       <div class="btn-group float-right">
         <input type="submit" class="btn btn-outline-info " name="tipo" id="id_tipo" value="Salida"/>
         <input type="submit" class="btn btn-outline-success " name="tipo" id="id_tipo" value="Entrada"/>
