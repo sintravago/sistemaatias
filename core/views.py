@@ -24,16 +24,15 @@ def marcar(request):
             if (Trabajador.objects.filter(cedula=form.cleaned_data['barcode']).exists()):
                 
                 trabajador = Trabajador.objects.get(cedula=form.cleaned_data['barcode'])
-                if 'entrada' in request.POST:
-                    e = "E"
-                else:
-                    e = "S"
+
                 if marca.objects.filter(trabajador=trabajador).exists():
                     ultima = marca.objects.filter(trabajador=trabajador).first()
-                    if ultima.tipo == e:
-                        return render(request,'core/marcar.html',{'form':form2, 'marca':'ya', 'e': e})
-                elif e == "S":
-                    return render(request,'core/marcar.html',{'form':form2, 'marca':'p'})
+                    if ultima.tipo == "E":
+                        e = "S"
+                    else:
+                        e = "E"                        
+                else:
+                    e = "E"
                 m = marca(trabajador=trabajador, tipo=e)
                 m.save()
                 return render(request,'core/marcar.html',{'form':form2, 'trabajador':trabajador, 'marca':e, 'hora':m.fecha})
