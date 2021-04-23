@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'horario.wsgi.application'
 #}
 #}
 
- DATABASES = {
+DATABASES = {
      'default': {
         'ENGINE': 'sql_server.pyodbc',
          'NAME': 'CONASIS',
