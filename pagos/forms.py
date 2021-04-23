@@ -46,3 +46,14 @@ class FacturaUpdateForm(forms.ModelForm):
             'direccion': forms.Textarea(attrs={'class':'form-control', 'placeholder':'Dirección Corporativa', 'rows':'3'}), 
             'estatus': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
         }
+
+class FacturaUpdatestatusForm(forms.ModelForm):
+    class Meta:
+        model = factura
+        fields = ['estatus',]
+        labels = {
+            'estatus': 'Estatus',
+        }
+        widgets = {
+            'estatus': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+        }

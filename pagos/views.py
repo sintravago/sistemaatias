@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import FormView, CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from .forms import FacturaForm, FacturaUpdateForm
+from .forms import FacturaForm, FacturaUpdateForm, FacturaUpdatestatusForm
 from .models import factura
-from django.db.models import Q
+from django.db.models import Q, Sum, F
+from django.contrib.auth.models import User, Group
 
 # Create your views here.
 @method_decorator(login_required, name='dispatch')
@@ -23,7 +25,16 @@ class FacturaListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.filter(estatus__in = ("R","S"))
+        grupo1 = Group.objects.get(name="nivel1")
+        grupo2 = Group.objects.get(name="nivel2")
+        grupo3 = Group.objects.get(name="nivel3")
+        object_list = self.model.objects.none()
+        if grupo1 in self.request.user.groups.all():
+            object_list = self.model.objects.filter(estatus__in = ("R","S")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
+        elif grupo2 in self.request.user.groups.all():
+            object_list = self.model.objects.filter(estatus__in = ("S","A")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
+        elif grupo3 in self.request.user.groups.all():
+            object_list = self.model.objects.filter(estatus__in = ("A","P")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
         if "search" in self.request.GET:
             name = self.request.GET['search']
             if (name != ''):
@@ -31,7 +42,7 @@ class FacturaListView(ListView):
                     for x in name.split():
                         object_list = object_list.filter(Q(razon__icontains = x) | Q(gerencia__nombre__icontains = x))
                 else:
-                    object_list = object_list.filter(Q(razon__icontains = name) | Q(concepto__icontains = name) | Q(rif__icontains = name) | Q(monto__icontains = name) | Q(iva__icontains = name) | Q(islr__icontains = name) | Q(gerencia__nombre__icontains = name))
+                    object_list = object_list.filter(Q(razon__icontains = name) | Q(concepto__icontains = name) | Q(rif__icontains = name) | Q(suma__icontains = name) | Q(gerencia__nombre__icontains = name))
         if "estatus" in self.request.GET:
             if self.request.GET["estatus"] != "0" :
                 object_list = object_list.filter(estatus = self.request.GET["estatus"])
@@ -39,9 +50,18 @@ class FacturaListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        estados = (("R", "Registradas"), ("S", "Seleccionadas"))
+        grupo1 = Group.objects.get(name="nivel1")
+        grupo2 = Group.objects.get(name="nivel2")
+        grupo3 = Group.objects.get(name="nivel3")
+        estados = (("",""),("",""))
+        if grupo1 in self.request.user.groups.all():
+            estados = (("R", "Registradas"), ("S", "Seleccionadas"))
+        elif grupo2 in self.request.user.groups.all():
+            estados = (("S", "Seleccionadas"), ("A", "Aprobadas"))
+        elif grupo3 in self.request.user.groups.all():
+            estados = (("A", "Aprobadas"), ("P", "Pagadas"))
+        
         context['estados'] = estados
-        print(estados)
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -59,32 +79,35 @@ class FacturaUpdate(UpdateView):
         return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
 
 @method_decorator(login_required, name='dispatch')
-class FacturaSelecListView(ListView):
+class FacturaUpdatestatus(UpdateView):
+    form_class = FacturaUpdatestatusForm
     model = factura
-    template_name = 'pagos/facturas.html'
-    paginate_by = 10
+    template_name = 'pagos/factura_edit_status.html'
 
-    def get_queryset(self):
-        object_list = self.model.objects.filter(estatus__in = ("R","S"))
-        if "search" in self.request.GET:
-            name = self.request.GET['search']
-            if (name != ''):
-                if len(name.split()) > 1:
-                    for x in name.split():
-                        object_list = object_list.filter(Q(razon__icontains = x) | Q(gerencia__nombre__icontains = x))
-                else:
-                    object_list = object_list.filter(Q(razon__icontains = name) | Q(concepto__icontains = name) | Q(rif__icontains = name) | Q(monto__icontains = name) | Q(iva__icontains = name) | Q(islr__icontains = name) | Q(gerencia__nombre__icontains = name))
-        if "estatus" in self.request.GET:
-            if self.request.GET["estatus"] != "0" :
-                object_list = object_list.filter(estatus = self.request.GET["estatus"])
-        return object_list
+    def get_success_url(self):
+        return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
+
+
+class ReporteView(TemplateView):
+
+    template_name = "pagos/reporte.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        estados = (("A", "Aprobadas"), ("S", "Seleccionadas"))
-        context['estados'] = estados
-        print(estados)
+        select = factura.objects.filter(estatus = "S")
+        reg = factura.objects.filter(estatus = "R")
+        apro = factura.objects.filter(estatus = "A")
+        paga = factura.objects.filter(estatus = "P")
+        if select.count() > 0:
+            context['selectm'] = select.aggregate(suma=Sum(F('monto') + F('iva') + F('islr')))['suma']
+            context['selectc'] = select.count()
+        if reg.count() > 0:
+            context['regm'] = reg.aggregate(suma=Sum(F('monto') + F('iva') + F('islr')))['suma']
+            context['regc'] = reg.count()
+        if apro.count() > 0:
+            context['aprom'] = apro.aggregate(suma=Sum(F('monto') + F('iva') + F('islr')))['suma']
+            context['aproc'] = apro.count()
+        if paga.count() > 0:
+            context['pagam'] = paga.aggregate(suma=Sum(F('monto') + F('iva') + F('islr')))['suma']
+            context['pagac'] = paga.count()
         return context
-
-
-

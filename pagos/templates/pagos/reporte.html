@@ -22,47 +22,47 @@
 {% endblock %}
 
 {% block contenido %}
+      {% load l10n %}
     <div class="card card-primary">
         <div class="card-header">
-            <h3 class="card-title">Detalle Factura - Estatus: <b>{{ object.get_estatus_display}}</b></h3>
+            <h3 class="card-title">Reporte</b></h3>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-            <table style="width:100%">
+            <table style="width:100%" class = "table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan = "2" style="text-align: center;">Registradas</th>
+                        <th colspan = "2" style="text-align: center;">Seleccionadas</th>
+                        <th colspan = "2" style="text-align: center;">Aprobadas</th>
+                        <th colspan = "2" style="text-align: center;">Pagadas</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: center;">Monto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: center;">Monto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: center;">Monto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: center;">Monto</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <tr>
-                        <td><label>RIF</label> <p>{{ object.rif }}</p></td>
-                        <td><label>Razón Social</label> <p>{{ object.razon }} </p></td>
-                        <td><label>N° Factura</label> <p>{{ object.nfactura }}</p></td>
-                        <td><label>N° Control</label> <p>{{ object.ncontrol }}</p></td>
+                        <td style="text-align: center;">{{ regc }}</td>
+                        <td style="text-align: center;">{{ regm|floatformat:2 }}</td>
+                        <td style="text-align: center;">{{ selectc }}</td>
+                        <td style="text-align: center;">{{ selectm|floatformat:2 }}</td>
+                        <td style="text-align: center;">{{ aproc }}</td>
+                        <td style="text-align: center;">{{ aprom|floatformat:2 }}</td>
+                        <td style="text-align: center;">{{ pagac }}</td>
+                        <td style="text-align: center;">{{ pagam|floatformat:2 }}</td>
                     </tr>
-                    <tr>
-                        <td><label>F. Factura</label> <p>{{ object.fechafactura|date:"d/m/Y" }} </p></td>
-                        <td><label>F. Recepción</label> <p>{{ object.fecharecepcion|date:"d/m/Y" }}</p></td>
-                        <td><label>Concepto</label> <p>{{ object.concepto }} </p></td>
-                        <td><label>Archivo</label> <p>{% if object.archivo %}<a href="{{ object.archivo.url }}" target="_blank">Ver</a>{% endif %}</p></td>
-                    </tr>
-                    <tr>
-                        <td><label>Monto</label> <p>{{ object.monto|floatformat:2 }} </p></td>
-                        <td><label>IVA</label> <p>{{ object.iva|floatformat:2 }}</p></td>
-                        <td><label>ISLR</label> <p>{{ object.islr|floatformat:2 }} </p></td>
-                    </tr>
-                    <tr>
-                        <td><label>Gerencia</label> <p>{{ object.gerencia }} </p></td>
-                        <td colspan = 2><label>dirección</label> <p>{{ object.direccion }}</p></td>
-                    </tr>
+
                 </tbody>
             </table>
-            <a href="{% url 'pagos:facturas' %}" class="btn btn-outline-info " />Facturas</a>
-            {% for grupo in request.user.groups.all %}
-                {% if grupo.name == "nivel1" %}
-                    <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
-                {% elif grupo.name == "nivel2" %}
-                    <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
-                {% elif grupo.name == "nivel3" and object.estatus != "P" %}
-                    <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
-                {% endif %}
-            {% endfor %}
+            
         </div>
         <!-- /.card-body -->
     </div>

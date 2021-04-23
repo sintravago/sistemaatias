@@ -237,12 +237,37 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <li class="nav-item">
-            <a href="{% url 'pagos:facturas' %}" class="nav-link {% if request.path == '/' %} active {% endif %}">
+          <li class="nav-item has-treeview {% if 'factura' in request.path %} menu-open {% endif %}">
+            <a href="#" class="nav-link {% if 'factura'   in request.path %} active {% endif %}">
               <i class="nav-icon fas fa-file-invoice"></i>
               <p>
                 Facturas
+                <i class="right fas fa-angle-left"></i>
               </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for grupo in request.user.groups.all %}
+                {% if grupo.name == "nivel1" %}
+                  <li class="nav-item">
+                    <a href="{% url 'pagos:factura_add' %}" class="nav-link {% if 'factura/add' in request.path %} active {% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Registrar</p>
+                    </a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              <li class="nav-item">
+                <a href="{% url 'pagos:facturas' %}" class="nav-link {% if 'facturas/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Buscar</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'pagos:reporte' %}" class="nav-link {% if 'reporte' in request.path %} active {% endif %}">
+              <i class="fas fa-book nav-icon"></i>
+              <p>Reporte</p>
             </a>
           </li>
         </ul>

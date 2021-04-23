@@ -34,3 +34,6 @@ class factura(models.Model):
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)
+    
+    def total(self):
+        return self.monto + self.iva + self.islr

@@ -138,6 +138,10 @@ TIME_INPUT_FORMATS = [
     '%H:%M',        # '14:30'
 ]
 
+USE_THOUSAND_SEPARATOR = True
+NUMBER_GROUPING = 3
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
