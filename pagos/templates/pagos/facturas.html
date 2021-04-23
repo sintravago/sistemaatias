@@ -17,19 +17,19 @@
 <form method="GET">
     <div class="row">
         <div class="col-12">
-            <div class="card card-primary">
+            <div class="card ">
                 <div class="card-header">
                     <h3 class="card-title">Facturas Clínica Atías</h3>
                     
-                    {% comment %} <div class="card-tools">
+                    <div class="card-tools">
                         <div class="row">
                             {%if request.user.is_staff %}
                                 <div class = "col-6">
                                     <div class="input-group" style="width: 300px;">
-                                        <select class="select2bs4" name="departamento" id="departamento" required>
-                                        <option value = "0">Todos</option>
-                                        {% for dep in departamentos %}
-                                            <option value = {{dep.pk}} {% if dep.pk|floatformat == request.GET.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
+                                        <select class="select2bs4" name="estatus" id="estatus" required>
+                                        <option value = "0"  >Todos</option>
+                                        {% for est in estados %}
+                                            <option value = {{est.0}} {% if est.0 == request.GET.estatus %} selected {% endif %}>{{est.1}}</option>
                                         {% endfor %}
                                         </select>
                                     </div>
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div> {% endcomment %}
+                    </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
@@ -60,6 +60,7 @@
                                 <th>N° Control</th>
                                 <th>Gerencia</th>
                                 <th>Monto</th>
+                                <th>Estatus</th>
                                 <th>Ver</th>
                             </tr>
                         </thead>
@@ -67,7 +68,7 @@
                             {% for factura in object_list %}
                                 <tr>
                                     <td> {{ factura.fecharecepcion|date:"d/m/Y" }} </td>
-                                    <td> {{factura.antiguedad.month}} {{factura.antiguedad.days}} </td>
+                                    <td> {{factura.antiguedad.days}} </td>
                                     <td> {{ factura.fechafactura|date:"d/m/Y" }} </td>
                                     <td> {{ factura.rif }} </td>
                                     <td> {{ factura.razon }} </td>
@@ -75,7 +76,8 @@
                                     <td> {{ factura.ncontrol }} </td>
                                     <td> {{ factura.gerencia }} </td>
                                     <td> {{ factura.monto|floatformat:2 }} </td>
-                                    <td> <i class="nav-icon fas fa-eye"></i></td>
+                                    <td> {{ factura.estatus }} </td>
+                                    <td> <a href="{% url "pagos:factura_view" factura.id %}"><i class="nav-icon fas fa-eye"></i></a></td>
                                 </tr>
                             {% empty %}
                                 <tr>

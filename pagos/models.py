@@ -9,10 +9,10 @@ def user_directory_path(instance, filename):
 # Create your models here.
 class factura(models.Model):
     choise_estatus = [
-        ('R', 'Registrado'),
-        ('S', 'Seleccionado'),
-        ('P', 'Pre-aprobado'),
-        ('A', 'Aprobado'),
+        ('R', 'Registrada'),
+        ('S', 'Seleccionada'),
+        ('A', 'Aprobada'),
+        ('P', 'Pagada'),
     ]
 
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')

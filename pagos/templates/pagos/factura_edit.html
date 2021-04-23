@@ -1,0 +1,170 @@
+{% extends "pagos/base.html" %}
+{% block title %} Trabajador {% endblock %}
+{% load static %}
+{% block titulo %}  {% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card card-primary">
+
+  <div class="card-header">
+    <h3 class="card-title">Registrar Factura</h3>
+  </div> 
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>{{ form.estatus.label }}</label> 
+            <select name="estatus" class="select2bs4 select2-hidden-accessible" style="width: 100 %;" id="id_estatus" data-select2-id="id_estatus" tabindex="-1" aria-hidden="true">
+              <option value="R" {% if form.estatus.value == "R" %}selected {% endif %}data-select2-id="2">Registrado</option>
+              <option value="S" {% if form.estatus.value == "S" %}selected {% endif %}> Seleccionado</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>{{ form.rif.label }}</label> 
+            {{ form.rif }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.ncontrol.label }}</label> 
+            {{ form.ncontrol }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.concepto.label }}</label> 
+            {{ form.concepto }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.islr.label }}</label> 
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+              </div>  
+              {{ form.islr }}
+            </div>
+            <!-- /.input group -->
+          </div>
+          <div class="form-group">
+            <label>{{ form.archivo.label }}</label> 
+            {{ form.archivo }}
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>{{ form.razon.label }}</label> 
+            {{ form.razon }}
+          </div>
+          <div class="form-group">
+             <label>{{ form.fechafactura.label }}</label> 
+              <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  {{ form.fechafactura }}
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label>{{ form.monto.label }}</label> 
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+              </div>  
+              {{ form.monto }}
+            </div>
+            <!-- /.input group -->
+          </div>
+          <div class="form-group">
+            <label>{{ form.gerencia.label }}</label> 
+            {{ form.gerencia }}
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>{{ form.nfactura.label }}</label> 
+            {{ form.nfactura }}
+          </div>
+          <div class="form-group">
+             <label>{{ form.fecharecepcion.label }}</label> 
+              <div class="input-group date" id="reservationdate2" data-target-input="nearest">
+                  {{ form.fecharecepcion }}
+                  <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label>{{ form.iva.label }}</label> 
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+              </div>  
+              {{ form.iva }}
+            </div>
+            <!-- /.input group -->
+          </div>
+          <div class="form-group">
+            <label>{{ form.direccion.label }}</label> 
+            {{ form.direccion }}
+          </div>
+        </div>
+      </div>
+      <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+      <div class="btn-group float-right">
+        <input type="submit" class="btn btn-outline-success " value="Aceptar"/>
+      </div>
+    </form>
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'core/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+  <script>
+    $(function () {
+      $('[data-mask]').inputmask()
+      //Date range picker
+      $('.select2').select2();
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('#reservationdate2').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+    })      
+  </script>
+
+  <script type="text/javascript">
+  $(document).ready(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}
