@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'a)3)jy4enbj0n2#ka7*6@@xy7br$j)1=)0455x(*=x+_tlvxv2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'pagos',
 ]
 
 MIDDLEWARE = [
@@ -75,25 +76,25 @@ WSGI_APPLICATION = 'horario.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-   # 'default': {
-       # 'ENGINE': 'django.db.backends.sqlite3',
-       # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-   # }
-# }
+#DATABASES = {
+#  'default': {
+#     'ENGINE': 'django.db.backends.sqlite3',
+#    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#}
+#}
 
-DATABASES = {
-    'default': {
-       'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CONASIS',
-        'USER': 'conasis',
-        'PASSWORD': 'zxasqw123*',
-        'HOST': '192.168.0.7',
-        'PORT': '1433',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        }
-    }
+ DATABASES = {
+     'default': {
+        'ENGINE': 'sql_server.pyodbc',
+         'NAME': 'CONASIS',
+         'USER': 'conasis',
+         'PASSWORD': 'zxasqw123*',
+         'HOST': '192.168.0.7',
+         'PORT': '1433',
+         'OPTIONS': {
+             'driver': 'ODBC Driver 17 for SQL Server',
+         }
+     }
 }
 
 # Password validation
@@ -137,6 +138,10 @@ TIME_INPUT_FORMATS = [
     '%H:%M',        # '14:30'
 ]
 
+USE_THOUSAND_SEPARATOR = True
+NUMBER_GROUPING = 3
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
