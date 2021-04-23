@@ -1,6 +1,11 @@
 from django.db import models
 from registration.models import departamento
+from datetime import datetime
 
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'rif_{0}/{1}'.format(instance.rif, filename)
+    
 # Create your models here.
 class factura(models.Model):
     choise_estatus = [
@@ -24,5 +29,8 @@ class factura(models.Model):
     islr = models.DecimalField(verbose_name='ISLR', max_digits=20, decimal_places=5)
     gerencia = models.ForeignKey(departamento, verbose_name="Gerencia", on_delete=models.CASCADE)
     direccion = models.TextField(verbose_name='Dirección Corporativa')
+    archivo = models.FileField(upload_to=user_directory_path, null=True,  blank=True)
     estatus = models.CharField(max_length=1, choices=choise_estatus, default='R')
 
+    def antiguedad(self):
+        return (datetime.now().date() - self.fecharecepcion)
