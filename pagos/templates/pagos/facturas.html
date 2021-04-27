@@ -51,11 +51,11 @@
                     <table id="example1" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Fecha/Recep.</th>
-                                <th>Ant.</th>
-                                <th>Fecha/Fact.</th>
+                                <th>Razón Soc.</th>
                                 <th>RIF</th>
-                                <th>Rason Soc.</th>
+                                <th>Fecha/Recep.</th>
+                                <th> <a href="{% url "pagos:facturas" %}?{% if request.GET.ord == "asc" %}ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
+                                <th>Fecha/Fact.</th>
                                 <th>N° Factura</th>
                                 <th>N° Control</th>
                                 <th>Gerencia</th>
@@ -67,16 +67,16 @@
                         <tbody>
                             {% for factura in object_list %}
                                 <tr>
+                                    <td> {{ factura.razon }} </td>
+                                    <td> {{ factura.rif }} </td>
                                     <td> {{ factura.fecharecepcion|date:"d/m/Y" }} </td>
                                     <td> {{factura.antiguedad.days}} </td>
                                     <td> {{ factura.fechafactura|date:"d/m/Y" }} </td>
-                                    <td> {{ factura.rif }} </td>
-                                    <td> {{ factura.razon }} </td>
                                     <td> {{ factura.nfactura }} </td>
                                     <td> {{ factura.ncontrol }} </td>
                                     <td> {{ factura.gerencia }} </td>
                                     <td> {{ factura.total|floatformat:2 }} </td>
-                                    <td> {{ factura.estatus }} </td>
+                                    <td> <a href="{% url  "pagos:facturas"%}?actu={{ factura.id }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                     <td> <a href="{% url "pagos:factura_view" factura.id %}"><i class="nav-icon fas fa-eye"></i></a></td>
                                 </tr>
                             {% empty %}
@@ -92,10 +92,10 @@
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}
                         <li class="paginate_button page-item first">
-                            <a class="page-link" href="?page=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">&laquo; Primera</a>
+                            <a class="page-link" href="?page=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
                         </li>
                         <li class="paginate_button page-item previous">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Anterior</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
                         </li>
                         {% endif %}
                         
@@ -105,10 +105,10 @@
 
                         {% if page_obj.has_next %}
                         <li class="paginate_button page-item next">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Siguiente</a>
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
                         </li>
                         <li class="paginate_button page-item last">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}">Ultima &raquo;</a>
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
                         </li>
                         {% endif %}
                     </ul>

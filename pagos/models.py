@@ -30,7 +30,8 @@ class factura(models.Model):
     gerencia = models.ForeignKey(departamento, verbose_name="Gerencia", on_delete=models.CASCADE)
     direccion = models.TextField(verbose_name='Dirección Corporativa')
     archivo = models.FileField(upload_to=user_directory_path, null=True,  blank=True)
-    estatus = models.CharField(max_length=1, choices=choise_estatus, default='R')
+    estatus = models.BooleanField(default=False)
+    estatus2 = models.BooleanField(default=False)
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)

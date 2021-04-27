@@ -30,11 +30,11 @@ class FacturaListView(ListView):
         grupo3 = Group.objects.get(name="nivel3")
         object_list = self.model.objects.none()
         if grupo1 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus__in = ("R","S")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
+            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
         elif grupo2 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus__in = ("S","A")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
+            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
         elif grupo3 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus__in = ("A","P")).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
+            object_list = self.model.objects.filter(estatus = True).annotate(suma=Sum(F('monto') + F('iva') + F('islr')))
         if "search" in self.request.GET:
             name = self.request.GET['search']
             if (name != ''):
@@ -46,6 +46,21 @@ class FacturaListView(ListView):
         if "estatus" in self.request.GET:
             if self.request.GET["estatus"] != "0" :
                 object_list = object_list.filter(estatus = self.request.GET["estatus"])
+        if "ord" in self.request.GET:
+            if self.request.GET["ord"] == "asc" :
+                object_list = object_list.order_by("fecharecepcion")
+            else:
+                object_list = object_list.order_by("-fecharecepcion")
+        else:
+            object_list = object_list.order_by("-fecharecepcion")
+
+        if "actu" in self.request.GET:
+            actualizar = factura.objects.get(pk = self.request.GET["actu"])
+            if actualizar.estatus == True:
+                actualizar.estatus = False
+            else:
+                actualizar.estatus = True
+            actualizar.save()
         return object_list
 
     def get_context_data(self, **kwargs):
@@ -86,7 +101,6 @@ class FacturaUpdatestatus(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
-
 
 class ReporteView(TemplateView):
 
