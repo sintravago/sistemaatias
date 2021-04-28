@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
+from django.shortcuts import redirect
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
@@ -42,10 +43,13 @@ class FacturaListView(ListView):
                     for x in name.split():
                         object_list = object_list.filter(Q(razon__icontains = x) | Q(gerencia__nombre__icontains = x))
                 else:
-                    object_list = object_list.filter(Q(razon__icontains = name) | Q(concepto__icontains = name) | Q(rif__icontains = name) | Q(suma__icontains = name) | Q(gerencia__nombre__icontains = name))
+                    object_list = object_list.filter(Q(razon__icontains = name) | Q(rif__icontains = name) | Q(suma__icontains = name) | Q(gerencia__nombre__icontains = name))
         if "estatus" in self.request.GET:
             if self.request.GET["estatus"] != "0" :
-                object_list = object_list.filter(estatus = self.request.GET["estatus"])
+                if grupo3 in self.request.user.groups.all():
+                    object_list = object_list.filter(estatus2 = self.request.GET["estatus"])
+                else:
+                    object_list = object_list.filter(estatus = self.request.GET["estatus"])
         if "ord" in self.request.GET:
             if self.request.GET["ord"] == "asc" :
                 object_list = object_list.order_by("fecharecepcion")
@@ -53,31 +57,44 @@ class FacturaListView(ListView):
                 object_list = object_list.order_by("-fecharecepcion")
         else:
             object_list = object_list.order_by("-fecharecepcion")
-
-        if "actu" in self.request.GET:
-            actualizar = factura.objects.get(pk = self.request.GET["actu"])
-            if actualizar.estatus == True:
-                actualizar.estatus = False
-            else:
-                actualizar.estatus = True
-            actualizar.save()
+            
         return object_list
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        grupo1 = Group.objects.get(name="nivel1")
-        grupo2 = Group.objects.get(name="nivel2")
-        grupo3 = Group.objects.get(name="nivel3")
-        estados = (("",""),("",""))
-        if grupo1 in self.request.user.groups.all():
-            estados = (("R", "Registradas"), ("S", "Seleccionadas"))
-        elif grupo2 in self.request.user.groups.all():
-            estados = (("S", "Seleccionadas"), ("A", "Aprobadas"))
-        elif grupo3 in self.request.user.groups.all():
-            estados = (("A", "Aprobadas"), ("P", "Pagadas"))
-        
-        context['estados'] = estados
-        return context
+def facturaStatusUpdate(request,pk):
+    actualizar = factura.objects.get(pk = pk)
+    if actualizar.estatus == True:
+        actualizar.estatus = False
+    else:
+        actualizar.estatus = True
+    actualizar.save()
+    add = "?suc=1"
+    if "search" in request.GET:
+        add += "&search=" + request.GET["search"]
+    if "ord" in request.GET:
+        add += "&ord=" + request.GET["ord"]
+    if "page" in request.GET:
+        add += "&page=" + request.GET["page"]
+    if "estatus" in request.GET:
+        add += "&estatus=" + request.GET["estatus"]
+    return redirect(reverse("pagos:facturas")+add)
+
+def facturaStatusUpdate2(request,pk):
+    actualizar = factura.objects.get(pk = pk)
+    if actualizar.estatus2 == True:
+        actualizar.estatus2 = False
+    else:
+        actualizar.estatus2 = True
+    actualizar.save()
+    add = "?suc=1"
+    if "search" in request.GET:
+        add += "&search=" + request.GET["search"]
+    if "ord" in request.GET:
+        add += "&ord=" + request.GET["ord"]
+    if "page" in request.GET:
+        add += "&page=" + request.GET["page"]
+    if "estatus" in request.GET:
+        add += "&estatus=" + request.GET["estatus"]
+    return redirect(reverse("pagos:facturas")+add)
 
 @method_decorator(login_required, name='dispatch')
 class FacturaDetailView(DetailView):

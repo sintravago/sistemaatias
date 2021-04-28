@@ -54,7 +54,7 @@
                 </tbody>
             </table>
             <a href="{% url 'pagos:facturas' %}" class="btn btn-outline-info " />Facturas</a>
-            {% for grupo in request.user.groups.all %}
+            {% comment %} {% for grupo in request.user.groups.all %}
                 {% if grupo.name == "nivel1" %}
                     <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
                 {% elif grupo.name == "nivel2" %}
@@ -62,7 +62,7 @@
                 {% elif grupo.name == "nivel3" and object.estatus != "P" %}
                     <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
                 {% endif %}
-            {% endfor %}
+            {% endfor %} {% endcomment %}
         </div>
         <!-- /.card-body -->
     </div>

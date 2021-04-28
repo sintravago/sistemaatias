@@ -28,9 +28,8 @@
                                     <div class="input-group input-group-sm" style="width: 300px;">
                                         <select class="form-control" name="estatus" id="estatus" required>
                                         <option value = "0"  >Todos</option>
-                                        {% for est in estados %}
-                                            <option value = {{est.0}} {% if est.0 == request.GET.estatus %} selected {% endif %}>{{est.1}}</option>
-                                        {% endfor %}
+                                        <option value = "True"  {% if "True" == request.GET.estatus %} selected {% endif %}>Seleccionados</option>
+                                        <option value = "False"  {% if "False" == request.GET.estatus %} selected {% endif %}>no Selecionados</option>
                                         </select>
                                     </div>
                                 </div>
@@ -54,7 +53,7 @@
                                 <th>Razón Soc.</th>
                                 <th>RIF</th>
                                 <th>Fecha/Recep.</th>
-                                <th> <a href="{% url "pagos:facturas" %}?{% if request.GET.ord == "asc" %}ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
+                                <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
                                 <th>Fecha/Fact.</th>
                                 <th>N° Factura</th>
                                 <th>N° Control</th>
@@ -76,7 +75,15 @@
                                     <td> {{ factura.ncontrol }} </td>
                                     <td> {{ factura.gerencia }} </td>
                                     <td> {{ factura.total|floatformat:2 }} </td>
-                                    <td> <a href="{% url  "pagos:facturas"%}?actu={{ factura.id }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                    {% for grupo in request.user.groups.all %}
+                                        {% if grupo.name == "nivel2" %}
+                                            <td> <a href="{% url  "pagos:facturas_update" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                        {% elif grupo.name == "nivel1" %}
+                                            <td> {% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
+                                        {% else %}
+                                            <td> <a href="{% url  "pagos:facturas_update2" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                        {% endif %}
+                                    {% endfor %}
                                     <td> <a href="{% url "pagos:factura_view" factura.id %}"><i class="nav-icon fas fa-eye"></i></a></td>
                                 </tr>
                             {% empty %}

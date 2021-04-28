@@ -264,12 +264,16 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="{% url 'pagos:reporte' %}" class="nav-link {% if 'reporte' in request.path %} active {% endif %}">
-              <i class="fas fa-book nav-icon"></i>
-              <p>Reporte</p>
-            </a>
-          </li>
+          {% for grupo in request.user.groups.all %}
+            {% if grupo.name == "nivel3" %}
+              <li class="nav-item">
+                <a href="{% url 'pagos:reporte' %}" class="nav-link {% if 'reporte' in request.path %} active {% endif %}">
+                  <i class="fas fa-book nav-icon"></i>
+                  <p>Reporte</p>
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
