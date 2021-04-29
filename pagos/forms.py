@@ -4,7 +4,7 @@ from .models import factura
 class FacturaForm(forms.ModelForm):
     class Meta:
         model = factura
-        fields = ['rif','razon','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'monto', 'iva', 'islr', 'gerencia', 'direccion', 'archivo']
+        fields = ['rif','razon','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'excento', 'iva', 'islr', 'gerencia', 'direccion', 'archivo']
         labels = {
             'rif': 'RIF',
         }
@@ -16,7 +16,8 @@ class FacturaForm(forms.ModelForm):
             'fechafactura': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Factura', 'data-target':'#reservationdate'}),
             'fecharecepcion': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Recepción', 'data-target':'#reservationdate2'}),
             'concepto': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Concepto'}),
-            'monto': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Monto', 'step':'.01', 'min':'0'}),
+            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.01', 'min':'0'}),
+            'excento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Excento', 'step':'.01', 'min':'0'}),
             'iva': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'IVA', 'step':'.01', 'min':'0'}),
             'islr': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'ISLR', 'step':'.01', 'min':'0'}),
             'gerencia': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
@@ -27,7 +28,7 @@ class FacturaForm(forms.ModelForm):
 class FacturaUpdateForm(forms.ModelForm):
     class Meta:
         model = factura
-        fields = ['estatus','rif','razon','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'monto', 'iva', 'islr', 'gerencia', 'direccion', 'archivo']
+        fields = ['estatus','rif','razon','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'excento', 'iva', 'islr', 'gerencia', 'direccion', 'archivo']
         labels = {
             'rif': 'RIF',
         }
@@ -39,21 +40,11 @@ class FacturaUpdateForm(forms.ModelForm):
             'fechafactura': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Factura', 'data-target':'#reservationdate'}),
             'fecharecepcion': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Recepción', 'data-target':'#reservationdate2'}),
             'concepto': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Concepto'}),
-            'monto': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Monto', 'step':'.01', 'min':'0'}),
+            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.01', 'min':'0'}),
+            'excento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Excento', 'step':'.01', 'min':'0'}),
             'iva': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'IVA', 'step':'.01', 'min':'0'}),
             'islr': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'ISLR', 'step':'.01', 'min':'0'}),
             'gerencia': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
             'direccion': forms.Textarea(attrs={'class':'form-control', 'placeholder':'Dirección Corporativa', 'rows':'3'}), 
-            'estatus': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
-        }
-
-class FacturaUpdatestatusForm(forms.ModelForm):
-    class Meta:
-        model = factura
-        fields = ['estatus',]
-        labels = {
-            'estatus': 'Estatus',
-        }
-        widgets = {
             'estatus': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
         }

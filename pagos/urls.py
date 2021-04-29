@@ -9,7 +9,6 @@ pagos_patterns = ([
     path('facturas/update2/<int:pk>', views.facturaStatusUpdate2, name ='facturas_update2'),
     path('facturas/view/<int:pk>', views.FacturaDetailView.as_view(), name ='factura_view'),
     path('facturas/edit/<int:pk>', views.FacturaUpdate.as_view(), name ='factura_edit'),
-    path('facturas/edite/<int:pk>', views.FacturaUpdatestatus.as_view(), name ='factura_edite'),
     path('reporte/', views.ReporteView.as_view(), name ='reporte'),
 ], 'pagos')
 
