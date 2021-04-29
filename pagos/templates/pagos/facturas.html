@@ -1,6 +1,7 @@
 {% extends "pagos/base.html" %}
-{% block title %} Trabajadores {% endblock %}
+{% block title %} Facturas {% endblock %}
 {% load static %}
+{% load l10n %}
 {% block titulo %}  {% endblock %}
 {% block head %} 
     <!-- DataTables -->
@@ -47,7 +48,7 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
-                    <table id="example1" class="table table-hover">
+                    <table id="example1" class="table table-hover projects">
                         <thead>
                             <tr>
                                 <th>Razón Soc.</th>
@@ -60,7 +61,7 @@
                                 <th>Gerencia</th>
                                 <th>Monto</th>
                                 <th>Estatus</th>
-                                <th>Ver</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,14 +78,14 @@
                                     <td> {{ factura.total|floatformat:2 }} </td>
                                     {% for grupo in request.user.groups.all %}
                                         {% if grupo.name == "nivel2" %}
-                                            <td> <a href="{% url  "pagos:facturas_update" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                            <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                         {% elif grupo.name == "nivel1" %}
                                             <td> {% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
                                         {% else %}
-                                            <td> <a href="{% url  "pagos:facturas_update2" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                            <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                         {% endif %}
                                     {% endfor %}
-                                    <td> <a href="{% url "pagos:factura_view" factura.id %}"><i class="nav-icon fas fa-eye"></i></a></td>
+                                    <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" factura.id %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
                                 </tr>
                             {% empty %}
                                 <tr>

@@ -246,8 +246,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'pagos:facturas' %}" class="nav-link {% if 'facturas/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Buscar</p>
+                </a>
+              </li>
               {% for grupo in request.user.groups.all %}
-                {% if grupo.name == "nivel1" %}
+                {% if grupo.name == "nivel1" or grupo.name == "nivel2" %}
                   <li class="nav-item">
                     <a href="{% url 'pagos:factura_add' %}" class="nav-link {% if 'factura/add' in request.path %} active {% endif %}">
                       <i class="far fa-circle nav-icon"></i>
@@ -256,24 +262,49 @@
                   </li>
                 {% endif %}
               {% endfor %}
+              
+            </ul>
+          </li>
+          <li class="nav-item has-treeview {% if 'empresa' in request.path %} menu-open {% endif %}">
+            <a href="#" class="nav-link {% if 'empresa'   in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-briefcase"></i>
+              <p>
+                Empresas
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'pagos:facturas' %}" class="nav-link {% if 'facturas/' in request.path %} active {% endif %}">
+                <a href="{% url 'pagos:empresas' %}" class="nav-link {% if 'empresas/' in request.path %} active {% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Buscar</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{% url 'pagos:empresa_add' %}" class="nav-link {% if 'empresa/add' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Registrar</p>
+                </a>
+              </li>
+              
             </ul>
           </li>
           {% for grupo in request.user.groups.all %}
             {% if grupo.name == "nivel3" %}
               <li class="nav-item">
-                <a href="{% url 'pagos:reporte' %}" class="nav-link {% if 'reporte' in request.path %} active {% endif %}">
+                <a href="{% url 'pagos:reporte' %}" class="nav-link {% if 'reporte/' in request.path %} active {% endif %}">
                   <i class="fas fa-book nav-icon"></i>
                   <p>Reporte</p>
                 </a>
               </li>
             {% endif %}
           {% endfor %}
+          <li class="nav-item">
+            <a href="{% url 'pagos:iva_edit' 1 %}" class="nav-link {% if 'iva/' in request.path %} active {% endif %}">
+              <i class="fas fa-percentage nav-icon"></i>
+              <p>IVA</p>
+            </a>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -283,33 +314,10 @@
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0 text-dark">{% block titulo %} Inicio {% endblock %}</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              {% block breadcums %}
-                <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-              {% endblock %}
-              {% comment %} <li class="breadcrumb-item active">Dashboard v1</li> {% endcomment %}
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        {% block contenido %} {% endblock %}
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+
+    {% block contenido %} {% endblock %}
+
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">

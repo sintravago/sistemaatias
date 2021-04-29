@@ -1,0 +1,93 @@
+{% extends "pagos/base.html" %}
+{% block title %} Empresa {% endblock %}
+{% load static %}
+{% load l10n %}
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>IVA</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="row">
+      
+      <div class="col-md-6">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Editar Porcentaje</h3>
+          </div> 
+          <!-- /.card-header -->
+          <div class="card-body">
+            <div class="form-group">
+              <label>{{ form.porcentaje.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                </div>
+                {{ form.porcentaje }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        <input type="submit" class="btn btn-outline-success float-right" value="Guardar"/>
+      </div>
+    </div>
+  </form>
+</section>  
+
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'core/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+  <script>
+    $(function () {
+      $('[data-mask]').inputmask()
+      //Date range picker
+      $('.select2').select2();
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('#reservationdate2').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+    })      
+  </script>
+
+  <script type="text/javascript">
+  $(document).ready(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}

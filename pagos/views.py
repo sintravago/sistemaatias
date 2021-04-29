@@ -7,12 +7,46 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from .forms import FacturaForm, FacturaUpdateForm
-from .models import factura
+from .forms import FacturaForm, FacturaUpdateForm, EmpresaForm, ivaUpdateForm
+from .models import factura, Empresa, iva
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
 
 # Create your views here.
+
+@method_decorator(login_required, name='dispatch')
+class EmpresaCreateView(CreateView):
+    form_class = EmpresaForm
+    template_name = 'pagos/empresa_add.html'
+    success_url = reverse_lazy("pagos:empresas")
+
+@method_decorator(login_required, name='dispatch')
+class EmpresaListView(ListView):
+    model = Empresa
+    template_name = 'pagos/empresas.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.all()
+        if "search" in self.request.GET:
+            name = self.request.GET['search']
+            if (name != ''):
+                if len(name.split()) > 1:
+                    for x in name.split():
+                        object_list = object_list.filter(razon__icontains = x)
+                else:
+                    object_list = object_list.filter(Q(razon__icontains = name) | Q(rif__icontains = name))
+        return object_list
+
+@method_decorator(login_required, name='dispatch')
+class EmpresaUpdate(UpdateView):
+    form_class = EmpresaForm
+    model = Empresa
+    template_name = 'pagos/empresa_edit.html'
+
+    def get_success_url(self):
+        return reverse_lazy("pagos:empresas")
+
 @method_decorator(login_required, name='dispatch')
 class FacturaCreateView(CreateView):
     form_class = FacturaForm
@@ -31,19 +65,19 @@ class FacturaListView(ListView):
         grupo3 = Group.objects.get(name="nivel3")
         object_list = self.model.objects.none()
         if grupo1 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('excento')))
+            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         elif grupo2 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('excento')))
+            object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         elif grupo3 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus = True).annotate(suma=Sum(F('big') + F('iva') + F('excento')))
+            object_list = self.model.objects.filter(estatus = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         if "search" in self.request.GET:
             name = self.request.GET['search']
             if (name != ''):
                 if len(name.split()) > 1:
                     for x in name.split():
-                        object_list = object_list.filter(Q(razon__icontains = x) | Q(gerencia__nombre__icontains = x))
+                        object_list = object_list.filter(empresa__razon__icontains = x)
                 else:
-                    object_list = object_list.filter(Q(razon__icontains = name) | Q(rif__icontains = name) | Q(suma__icontains = name) | Q(gerencia__nombre__icontains = name))
+                    object_list = object_list.filter(Q(empresa__razon__icontains = name) | Q(empresa__rif__icontains = name) | Q(suma__icontains = name) )
         if "estatus" in self.request.GET:
             if self.request.GET["estatus"] != "0" :
                 if grupo3 in self.request.user.groups.all():
@@ -110,6 +144,15 @@ class FacturaUpdate(UpdateView):
     def get_success_url(self):
         return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
 
+@method_decorator(login_required, name='dispatch')
+class IvaUpdate(UpdateView):
+    form_class = ivaUpdateForm
+    model = iva
+    template_name = 'pagos/iva_edit.html'
+
+    def get_success_url(self):
+        return reverse_lazy("pagos:iva_edit", kwargs={'pk': self.kwargs['pk']})
+
 class ReporteView(TemplateView):
 
     template_name = "pagos/reporte.html"
@@ -121,15 +164,15 @@ class ReporteView(TemplateView):
         apro = factura.objects.filter(estatus = "A")
         paga = factura.objects.filter(estatus = "P")
         if select.count() > 0:
-            context['selectm'] = select.aggregate(suma=Sum(F('big') + F('iva') + F('excento')))['suma']
+            context['selectm'] = select.aggregate(suma=Sum(F('big') + F('iva') + F('exento')))['suma']
             context['selectc'] = select.count()
         if reg.count() > 0:
-            context['regm'] = reg.aggregate(suma=Sum(F('big') + F('iva') + F('excento')))['suma']
+            context['regm'] = reg.aggregate(suma=Sum(F('big') + F('iva') + F('exento')))['suma']
             context['regc'] = reg.count()
         if apro.count() > 0:
-            context['aprom'] = apro.aggregate(suma=Sum(F('big') + F('iva') + F('excento')))['suma']
+            context['aprom'] = apro.aggregate(suma=Sum(F('big') + F('iva') + F('exento')))['suma']
             context['aproc'] = apro.count()
         if paga.count() > 0:
-            context['pagam'] = paga.aggregate(suma=Sum(F('big') + F('iva') + F('excento')))['suma']
+            context['pagam'] = paga.aggregate(suma=Sum(F('big') + F('iva') + F('exento')))['suma']
             context['pagac'] = paga.count()
         return context
