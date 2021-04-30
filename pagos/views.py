@@ -8,9 +8,10 @@ from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .forms import FacturaForm, FacturaUpdateForm, EmpresaForm, ivaUpdateForm
-from .models import factura, Empresa, iva
+from .models import factura, Empresa, iva, Islr
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -52,6 +53,12 @@ class FacturaCreateView(CreateView):
     form_class = FacturaForm
     template_name = 'pagos/factura_add.html'
     success_url = reverse_lazy("pagos:factura_add")
+
+    def get_success_url(self):
+        self.object.iva = iva.objects.get(id=1).porcentaje
+        self.object.islr = self.object.tiposervicio.porcentaje
+        self.object.save()
+        return reverse_lazy("pagos:factura_add")
 
 @method_decorator(login_required, name='dispatch')
 class FacturaListView(ListView):
@@ -137,9 +144,9 @@ class FacturaDetailView(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class FacturaUpdate(UpdateView):
-    form_class = FacturaUpdateForm
+    form_class = FacturaForm
+    template_name = 'pagos/factura_add.html'
     model = factura
-    template_name = 'pagos/factura_edit.html'
 
     def get_success_url(self):
         return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
@@ -176,3 +183,14 @@ class ReporteView(TemplateView):
             context['pagam'] = paga.aggregate(suma=Sum(F('big') + F('iva') + F('exento')))['suma']
             context['pagac'] = paga.count()
         return context
+
+def get_servicio_ajax(request):
+    if request.method == "POST":
+        empresa_id = request.POST['empresa_id']
+        try:
+            emp = Empresa.objects.get(id = empresa_id)
+            servicio = Islr.objects.filter(Tipo = emp.clasificacion)
+        except Exception:
+            data['error_message'] = 'error'
+            return JsonResponse(data)
+        return JsonResponse(list(servicio.values('id', 'codigo')), safe = False)

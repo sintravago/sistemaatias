@@ -62,6 +62,12 @@
             </div>
             <!-- /.input group -->
           </div>
+          <div class="form-group">
+            <label>{{ form.tiposervicio.label }}</label> 
+            <select class="form-control" name="tiposervicio" id="id_tiposervicio">
+                <option selected disabled>Selecciona un tipo de servicio</option>
+            </select>
+          </div>
         </div>
         <div class="col-sm-4">
           <div class="form-group">
@@ -114,7 +120,12 @@
                   </div>
               </div>
           </div>
-          
+           <div class="form-group">
+            <label>% {{ form.retiva.label }}</label> 
+            <div class="input-group">
+              {{ form.retiva }}
+            </div>
+          </div>
           <div class="form-group">
             <label>{{ form.archivo.label }}</label> 
             <div class="input-group">
@@ -160,6 +171,26 @@
   <script type="text/javascript">
   $(document).ready(function () {
     bsCustomFileInput.init();
+  });
+</script>
+<script>
+  $("#id_empresa").change(function () {
+    const empresaId = $(this).val();  // get the selected subject ID from the HTML dropdown list 
+    $.ajax({                       // initialize an AJAX request
+      type: "POST",
+      url: '{% url "pagos:get_servicio_ajax" %}',
+      data: {
+        'empresa_id': empresaId,       // add the country id to the POST parameters
+        'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function (data) {   // `data` is from `get_topics_ajax` view function
+        let html_data = '<option value="">---------</option>';
+        data.forEach(function (data) {
+            html_data += `<option value="${data.id}">${data.codigo}</option>`
+        });
+        $("#id_tiposervicio").html(html_data); // replace the contents of the topic input with the data that came from the server
+      }
+    });
   });
 </script>
 {% endblock %}

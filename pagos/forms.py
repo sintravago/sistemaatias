@@ -17,7 +17,7 @@ class EmpresaForm(forms.ModelForm):
 class FacturaForm(forms.ModelForm):
     class Meta:
         model = factura
-        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago']
+        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago', 'retiva', 'tiposervicio']
         widgets = {
             'nfactura': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número de factura'}),
             'ncontrol': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Número de control', 'min':'1'}),
@@ -30,6 +30,8 @@ class FacturaForm(forms.ModelForm):
             'cambiopago': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Pago', 'step':'.01', 'min':'0'}),
             'archivo': forms.FileInput(attrs={'class':'custom-file-input'}),
             'empresa': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+            'retiva': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+            'tiposervicio': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
         }
 
 class FacturaUpdateForm(forms.ModelForm):

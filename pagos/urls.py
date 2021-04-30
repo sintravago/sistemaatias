@@ -14,6 +14,7 @@ pagos_patterns = ([
     path('facturas/edit/<int:pk>', views.FacturaUpdate.as_view(), name ='factura_edit'),
     path('iva/edit/<int:pk>', views.IvaUpdate.as_view(), name ='iva_edit'),
     path('reporte/', views.ReporteView.as_view(), name ='reporte'),
+    path('get_servicio_ajax/', views.get_servicio_ajax, name ='get_servicio_ajax'),
 ], 'pagos')
 
 urlpatterns = [
