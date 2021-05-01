@@ -44,9 +44,17 @@
                         <td><label>Archivo</label> <p>{% if object.archivo %}<a class="btn btn-primary btn-sm" href="{{ object.archivo.url }}" target="_blank"><i class="nav-icon fas fa-eye"></i>&nbsp;&nbsp;Ver</a>{% endif %}</p></td>
                     </tr>
                     <tr>
-                        <td><label>Monto</label> <p>{{ object.monto|floatformat:2 }} </p></td>
-                        <td><label>IVA</label> <p>{{ object.iva|floatformat:2 }}</p></td>
-                        <td><label>ISLR</label> <p>{{ object.islr|floatformat:2 }} </p></td>
+                        <td><label>BIG</label> <p>{{ object.big|floatformat:2 }} </p></td>
+                        <td><label>Exento</label> <p>{{ object.exento|floatformat:2 }} </p></td>
+                        <td><label>IVA</label> <p>{{ object.caliva|floatformat:2 }}</p></td>
+                        <td><label>Total BS| Total USD </label> <p>{{ object.total|floatformat:2 }} | {{ object.totalusd|floatformat:2 }}</p></td>
+                        
+                    </tr>
+                    <tr>
+                        <td><label>Retención IVA</label> <p>{{ object.calretiva|floatformat:2 }} </p></td>
+                        <td><label>Retención ISLR</label> <p>{{ object.calislr|floatformat:2 }} </p></td>
+                        <td><label>Pago en USD</label> <p>{{ object.divisa|floatformat:2 }}</p></td>
+                        <td><label>Pago en BS</label> <p>{{ object.pagoenbs|floatformat:2 }} </p></td>
                     </tr>
                 </tbody>
             </table>

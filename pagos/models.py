@@ -2,6 +2,7 @@ from django.db import models
 from registration.models import departamento
 from datetime import datetime
 from django.contrib.auth.models import User
+import math
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -71,14 +72,14 @@ class factura(models.Model):
     fechafactura = models.DateField(verbose_name='Fecha de Factura')
     fecharecepcion = models.DateField(verbose_name='Fecha de Recepción')
     concepto = models.CharField(max_length=150 , verbose_name='Concepto')
-    big = models.DecimalField(verbose_name='BIG', max_digits=20, decimal_places=5)
-    exento = models.DecimalField(verbose_name='Exento', max_digits=20, decimal_places=5)
+    big = models.DecimalField(verbose_name='BIG', max_digits=20, decimal_places=5, default=0)
+    exento = models.DecimalField(verbose_name='Exento', max_digits=20, decimal_places=5, default=0)
     iva = models.DecimalField(verbose_name='IVA', max_digits=20, decimal_places=5, default=0)
     islr = models.DecimalField(verbose_name='ISL', max_digits=20, decimal_places=5, default=0)
     retiva = models.IntegerField(verbose_name='Retención IVA', choices=choise_iva, default=75)
-    cambiofactura = models.DecimalField(verbose_name='Tipo de cambio (factura)', max_digits=20, decimal_places=5, null=True,  blank=True)
-    cambiopago = models.DecimalField(verbose_name='Tipo de cambio (fecha de pago)', max_digits=20, decimal_places=5, null=True,  blank=True)
-    divisa = models.DecimalField(verbose_name='A pagar en USD', max_digits=20, decimal_places=5, null=True,  blank=True)
+    cambiofactura = models.DecimalField(verbose_name='Tipo de cambio (factura)', max_digits=20, decimal_places=5, default = 0)
+    cambiopago = models.DecimalField(verbose_name='Tipo de cambio (fecha de pago)', max_digits=20, decimal_places=5, default = 0)
+    divisa = models.DecimalField(verbose_name='A pagar en USD', max_digits=20, decimal_places=5, default=0)
     archivo = models.FileField(upload_to=user_directory_path, null=True,  blank=True)
     estatus = models.BooleanField(default=False)
     estatus2 = models.BooleanField(default=False)
@@ -86,9 +87,27 @@ class factura(models.Model):
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)
-    
+
+    def caliva(self):
+        return self.big * self.iva / 100
+
     def total(self):
-        return self.big + self.iva + self.exento
+        return self.caliva() + self.big + self.exento
+
+    def calretiva(self):
+        return self.caliva() * self.retiva / 100
+
+    def calislr(self):
+        return (self.big + self.exento) * self.islr / 100
+
+    def totalusd(self):
+        return (((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+    
+    def pagoenusd(self):
+        return math.floor(((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+
+    def pagoenbs(self):
+        return ((self.totalusd() - self.divisa) * self.cambiopago) + (self.caliva() - self.calretiva())
 
 class iva(models.Model):
     porcentaje = models.DecimalField(verbose_name='IVA', max_digits=20, decimal_places=5)

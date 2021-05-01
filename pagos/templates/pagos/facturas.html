@@ -52,6 +52,7 @@
                         <thead>
                             <tr>
                                 <th>RIF</th>                                
+                                <th>Razón Soc.</th>                             
                                 <th>Fecha/Recep.</th>
                                 <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
                                 <th>Fecha/Fact.</th>
