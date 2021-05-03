@@ -101,10 +101,16 @@ class factura(models.Model):
         return (self.big + self.exento) * self.islr / 100
 
     def totalusd(self):
-        return (((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+		if self.cambiofactura > 0:
+			return (((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+		else:
+			return 0
     
     def pagoenusd(self):
-        return math.floor(((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+		if self.cambiofactura > 0:
+			return math.floor(((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+		else:
+			return 0
 
     def pagoenbs(self):
         return ((self.totalusd() - self.divisa) * self.cambiopago) + (self.caliva() - self.calretiva())

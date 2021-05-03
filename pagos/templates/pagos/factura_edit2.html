@@ -1,7 +1,11 @@
 {% extends "pagos/base.html" %}
-{% block title %} Factura {% endblock %}
+{% block title %} Trabajador {% endblock %}
 {% load static %}
-{% load l10n %}
+{% block titulo %}  {% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
 {% block contenido %}
 {% if form.errors %}
   {% for field in form %}
@@ -31,17 +35,57 @@
   <div class="card-body">
     <form method="post" enctype="multipart/form-data">{% csrf_token %}
       <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>{{ form.estatus.label }}</label> 
+            <select name="estatus" class="select2bs4 select2-hidden-accessible" style="width: 100 %;" id="id_estatus" data-select2-id="id_estatus" tabindex="-1" aria-hidden="true">
+              <option value="R" {% if form.estatus.value == "R" %}selected {% endif %}> Registradas </option>
+              <option value="S" {% if form.estatus.value == "S" %}selected {% endif %}> Seleccionadas </option>
+            </select>
+          </div>
+        </div>
         <div class="col-sm-4">
           <div class="form-group">
-            <label>{{ form.empresa.label }}</label> 
-            {{ form.empresa }}
+            <label>{{ form.rif.label }}</label> 
+            {{ form.rif }}
           </div>
-          
+          <div class="form-group">
+            <label>{{ form.ncontrol.label }}</label> 
+            {{ form.ncontrol }}
+          </div>
           <div class="form-group">
             <label>{{ form.concepto.label }}</label> 
             {{ form.concepto }}
           </div>
-
+          <div class="form-group">
+            <label>{{ form.islr.label }}</label> 
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+              </div>  
+              {{ form.islr }}
+            </div>
+            <!-- /.input group -->
+          </div>
+          <div class="form-group">
+            <label>{{ form.archivo.label }}</label> 
+            {{ form.archivo }}
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>{{ form.razon.label }}</label> 
+            {{ form.razon }}
+          </div>
+          <div class="form-group">
+             <label>{{ form.fechafactura.label }}</label> 
+              <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                  {{ form.fechafactura }}
+                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+              </div>
+          </div>
           <div class="form-group">
             <label>{{ form.big.label }}</label> 
             <div class="input-group">
@@ -53,74 +97,14 @@
             <!-- /.input group -->
           </div>
           <div class="form-group">
-            <label>{{ form.cambiofactura.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.cambiofactura }}
-            </div>
-            <!-- /.input group -->
-          </div>
-          <div class="form-group">
-            <label>{{ form.tiposervicio.label }}</label> 
-            <select class="form-control" name="tiposervicio" id="id_tiposervicio">
-                <option selected disabled>Selecciona un tipo de servicio</option>
-            </select>
+            <label>{{ form.gerencia.label }}</label> 
+            {{ form.gerencia }}
           </div>
         </div>
         <div class="col-sm-4">
           <div class="form-group">
             <label>{{ form.nfactura.label }}</label> 
             {{ form.nfactura }}
-          </div>
-          <div class="form-group">
-             <label>{{ form.fechafactura.label }}</label> 
-              <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                  {{ form.fechafactura }}
-                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                  </div>
-              </div>
-          </div>
-          
-          <div class="form-group">
-            <label>{{ form.exento.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.exento }}
-            </div>
-            <!-- /.input group -->
-          </div>
-          <div class="form-group">
-            <label>{{ form.cambiopago.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.cambiopago }}
-            </div>
-            <!-- /.input group -->
-          </div>
-
-          <div class="form-group">
-            <label>{{ form.divisa.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.divisa }}
-            </div>
-            <!-- /.input group -->
-          </div>
-         
-        </div>
-        <div class="col-sm-4">
-          <div class="form-group">
-            <label>{{ form.ncontrol.label }}</label> 
-            {{ form.ncontrol }}
           </div>
           <div class="form-group">
              <label>{{ form.fecharecepcion.label }}</label> 
@@ -131,24 +115,23 @@
                   </div>
               </div>
           </div>
-           <div class="form-group">
-            <label>% {{ form.retiva.label }}</label> 
+          <div class="form-group">
+            <label>{{ form.iva.label }}</label> 
             <div class="input-group">
-              {{ form.retiva }}
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
+              </div>  
+              {{ form.iva }}
             </div>
+            <!-- /.input group -->
           </div>
           <div class="form-group">
-            <label>{{ form.archivo.label }}</label> 
-            <div class="input-group">
-              <div class="custom-file">
-                {{ form.archivo }}
-                <label class="custom-file-label" for="id_archivo">Seleccione un Archivo</label>
-              </div>
-            </div>  
+            <label>{{ form.direccion.label }}</label> 
+            {{ form.direccion }}
           </div>
         </div>
       </div>
-      <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
+      <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
       <div class="btn-group float-right">
         <input type="submit" class="btn btn-outline-success " value="Aceptar"/>
       </div>
@@ -182,26 +165,6 @@
   <script type="text/javascript">
   $(document).ready(function () {
     bsCustomFileInput.init();
-  });
-</script>
-<script>
-  $("#id_empresa").change(function () {
-    const empresaId = $(this).val();  // get the selected subject ID from the HTML dropdown list 
-    $.ajax({                       // initialize an AJAX request
-      type: "POST",
-      url: '{% url "pagos:get_servicio_ajax" %}',
-      data: {
-        'empresa_id': empresaId,       // add the country id to the POST parameters
-        'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
-      },
-      success: function (data) {   // `data` is from `get_topics_ajax` view function
-        let html_data = '<option value="">---------</option>';
-        data.forEach(function (data) {
-            html_data += `<option value="${data.id}">${data.codigo}</option>`
-        });
-        $("#id_tiposervicio").html(html_data); // replace the contents of the topic input with the data that came from the server
-      }
-    });
   });
 </script>
 {% endblock %}
