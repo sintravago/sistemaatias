@@ -19,7 +19,7 @@ class Islr(models.Model):
         ('PJNCD', 'Persona Jurídica No Constituida Domiciliada'),
     ]
     codigo = models.IntegerField(verbose_name='Código Seniat')
-    actividad = models.CharField(max_length=150 , verbose_name='Actividad')
+    actividad = models.CharField(max_length=250 , verbose_name='Actividad')
     Tipo = models.CharField(max_length=5, choices=choise_clasificacion, default='PNR')
     retencion = models.DecimalField(verbose_name='% Base Retención', max_digits=20, decimal_places=5, null=True,  blank=True)
     mayoresa = models.DecimalField(verbose_name='Mayores a Bs', max_digits=20, decimal_places=5, null=True,  blank=True)
