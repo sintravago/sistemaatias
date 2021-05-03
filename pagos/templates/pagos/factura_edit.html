@@ -66,6 +66,9 @@
             <label>{{ form.tiposervicio.label }}</label> 
             <select class="form-control" name="tiposervicio" id="id_tiposervicio">
                 <option selected disabled>Selecciona un tipo de servicio</option>
+				{% for serv in servicios %}
+					<option value"{{ serv.id }}">{{ serv.codigo }}</option>
+				{% endfor %}
             </select>
           </div>
         </div>

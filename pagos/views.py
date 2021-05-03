@@ -145,7 +145,7 @@ class FacturaDetailView(DetailView):
 @method_decorator(login_required, name='dispatch')
 class FacturaUpdate(UpdateView):
     form_class = FacturaForm
-    template_name = 'pagos/factura_add.html'
+    template_name = 'pagos/factura_edit.html'
     model = factura
 
     def get_success_url(self):
