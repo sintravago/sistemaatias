@@ -90,7 +90,7 @@ class factura(models.Model):
     estatus2 = models.BooleanField(default=False)
     estatus3 = models.BooleanField(default=False)
     tiposervicio = models.ForeignKey(Islr, verbose_name="Tipo de servicio", on_delete=models.PROTECT)
-    departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
+    departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT, null=True, defalt= None)
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)
