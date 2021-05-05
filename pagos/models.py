@@ -24,11 +24,14 @@ class Islr(models.Model):
     retencion = models.DecimalField(verbose_name='% Base Retención', max_digits=20, decimal_places=5, null=True,  blank=True)
     mayoresa = models.DecimalField(verbose_name='Mayores a Bs', max_digits=20, decimal_places=5, null=True,  blank=True)
     porcentaje = models.DecimalField(verbose_name='%', max_digits=20, decimal_places=5, null=True,  blank=True)
-    sustraendo = models.DecimalField(verbose_name='Sustraendo Bs', max_digits=20, decimal_places=5, null=True,  blank=True)
+    sustraendo = models.DecimalField(verbose_name='Sustraendo Bs', max_digits=20, decimal_places=5, default = 0)
     sustraendotipo = models.CharField(max_length=100 , verbose_name='Actividad', null=True,  blank=True)
 
     def __str__(self):
         return "{}".format(self.codigo)
+    
+    def descript(self):
+        return "{} : {}".format(self.codigo, self.actividad)
 
 class Empresa(models.Model):
     choise_clasificacion = [
@@ -45,20 +48,6 @@ class Empresa(models.Model):
         ('J', 'J'),
         ('G', 'G'),
     ]
-    created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
-    updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
-    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
-    rif = models.IntegerField(verbose_name='RIF')
-    rift = models.CharField(max_length=1, choices=choise_rift, default='J')
-    razon = models.CharField(max_length=150 , verbose_name='Razón Social')
-    clasificacion = models.CharField(max_length=5, choices=choise_clasificacion, default='PNR')
-    direccion = models.TextField(verbose_name='Dirección Corporativa', null = True, blank = True)
-    tlf = models.CharField(max_length=50 , verbose_name='Teléfono', null = True, blank = True)
-
-    def __str__(self):
-        return "{} ({}-{})".format(self.razon, self.rift, self.rif)
-
-class factura(models.Model):
     choise_iva = [
         (75, 75),
         (100, 100),
@@ -66,17 +55,33 @@ class factura(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
+    rif = models.IntegerField(verbose_name='RIF')
+    rift = models.CharField(max_length=1, choices=choise_rift, default='J')
+    razon = models.CharField(max_length=150 , verbose_name='Razón Social')
+    clasificacion = models.CharField(max_length=5, choices=choise_clasificacion, default='PNR')
+    retiva = models.IntegerField(verbose_name='Retención IVA', choices=choise_iva, default=75)
+    direccion = models.TextField(verbose_name='Dirección Corporativa', null = True, blank = True)
+    tlf = models.CharField(max_length=50 , verbose_name='Teléfono', null = True, blank = True)
+
+    def __str__(self):
+        return "{} ({}-{})".format(self.razon, self.rift, self.rif)
+
+class factura(models.Model):
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
+    updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
     empresa = models.ForeignKey(Empresa, verbose_name="Empresa", on_delete=models.PROTECT)
     nfactura = models.CharField(max_length=150, verbose_name='Número de Factura')
-    ncontrol = models.IntegerField(verbose_name='Número de Control')
+    ncontrol = models.CharField(max_length=150, verbose_name='Número de Control')
     fechafactura = models.DateField(verbose_name='Fecha de Factura')
     fecharecepcion = models.DateField(verbose_name='Fecha de Recepción')
     concepto = models.CharField(max_length=150 , verbose_name='Concepto')
     big = models.DecimalField(verbose_name='BIG', max_digits=20, decimal_places=5, default=0)
     exento = models.DecimalField(verbose_name='Exento', max_digits=20, decimal_places=5, default=0)
     iva = models.DecimalField(verbose_name='IVA', max_digits=20, decimal_places=5, default=0)
+    retiva = models.IntegerField(verbose_name='Retención IVA', default=75)
     islr = models.DecimalField(verbose_name='ISL', max_digits=20, decimal_places=5, default=0)
-    retiva = models.IntegerField(verbose_name='Retención IVA', choices=choise_iva, default=75)
+    sustraendo = models.DecimalField(verbose_name='Sustraendo', max_digits=20, decimal_places=5, default=0)
     cambiofactura = models.DecimalField(verbose_name='Tipo de cambio (factura)', max_digits=20, decimal_places=5, default = 0)
     cambiopago = models.DecimalField(verbose_name='Tipo de cambio (fecha de pago)', max_digits=20, decimal_places=5, default = 0)
     divisa = models.DecimalField(verbose_name='A pagar en USD', max_digits=20, decimal_places=5, default=0)
@@ -84,6 +89,7 @@ class factura(models.Model):
     estatus = models.BooleanField(default=False)
     estatus2 = models.BooleanField(default=False)
     tiposervicio = models.ForeignKey(Islr, verbose_name="Tipo de servicio", on_delete=models.PROTECT)
+    departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)
@@ -98,22 +104,28 @@ class factura(models.Model):
         return self.caliva() * self.retiva / 100
 
     def calislr(self):
-        return (self.big + self.exento) * self.islr / 100
+        return ((self.big + self.exento) * self.islr / 100) - self.sustraendo
 
     def totalusd(self):
         if self.cambiofactura > 0:
-            return (((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
-        else:
-            return 0
-    
-    def pagoenusd(self):
-        if self.cambiofactura > 0:
-            return math.floor(((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura)
+            return self.total() / self.cambiofactura
         else:
             return 0
 
+    def pagousd(self):
+        if self.cambiofactura > 0:
+            return ((self.total() - self.calretiva() - self.calislr()) - (self.caliva() - self.calretiva())) / self.cambiofactura
+        else:
+            return 0
+    
+    def totalbs(self):
+        return self.caliva() - self.calretiva()
+
     def pagoenbs(self):
-        return ((self.totalusd() - self.divisa) * self.cambiopago) + (self.caliva() - self.calretiva())
+        if self.cambiopago > 0:
+            return ((self.pagousd() - self.divisa) * self.cambiopago) + (self.caliva() - self.calretiva())
+        else:
+            return self.total() - self.calretiva() - self.calislr()
 
 class iva(models.Model):
     porcentaje = models.DecimalField(verbose_name='IVA', max_digits=20, decimal_places=5)

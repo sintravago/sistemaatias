@@ -62,6 +62,12 @@
               {{ form.clasificacion }}
             </div>
             
+            <div class="form-group">
+              <label>% {{ form.retiva.label }}</label> 
+              <div class="input-group">
+                {{ form.retiva }}
+              </div>
+            </div>
             
             <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
             
@@ -96,7 +102,7 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <a href="{% url "pagos:empresas" %}" class="btn btn-outline-secondary">Cancel</a>
+        <a href="{% url "pagos:empresas" %}" class="btn btn-outline-secondary">Cancelar</a>
         <input type="submit" class="btn btn-outline-success float-right" value="Guardar"/>
       </div>
     </div>

@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from .forms import FacturaForm, FacturaUpdateForm, EmpresaForm, ivaUpdateForm
+from .forms import FacturaForm, EmpresaForm, ivaUpdateForm, FacturaEditForm
 from .models import factura, Empresa, iva, Islr
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
@@ -52,13 +52,18 @@ class EmpresaUpdate(UpdateView):
 class FacturaCreateView(CreateView):
     form_class = FacturaForm
     template_name = 'pagos/factura_add.html'
-    success_url = reverse_lazy("pagos:factura_add")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['iva'] = str(iva.objects.get(id=1).porcentaje).replace(',', '.')
+        return context
 
     def get_success_url(self):
         self.object.iva = iva.objects.get(id=1).porcentaje
         self.object.islr = self.object.tiposervicio.porcentaje
+        self.object.sustraendo = self.object.tiposervicio.sustraendo
         self.object.save()
-        return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy("pagos:factura_view", kwargs={'pk': self.object.id})
 
 @method_decorator(login_required, name='dispatch')
 class FacturaListView(ListView):
@@ -144,13 +149,14 @@ class FacturaDetailView(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class FacturaUpdate(UpdateView):
-    form_class = FacturaForm
+    form_class = FacturaEditForm
     template_name = 'pagos/factura_edit.html'
     model = factura
 
     def get_success_url(self):
         self.object.iva = iva.objects.get(id=1).porcentaje
         self.object.islr = self.object.tiposervicio.porcentaje
+        self.object.sustraendo = self.object.tiposervicio.sustraendo
         self.object.save()
         return reverse_lazy("pagos:factura_view", kwargs={'pk': self.kwargs['pk']})
 	
@@ -158,6 +164,10 @@ class FacturaUpdate(UpdateView):
         context = super().get_context_data(**kwargs)
         servicios = Islr.objects.filter(Tipo = self.object.empresa.clasificacion)
         context['servicios'] = servicios
+        context['iva'] = str(self.object.iva).replace(',', '.')
+        context['retiva'] = str(self.object.retiva).replace(',', '.')
+        context['sustraendo'] = str(self.object.sustraendo).replace(',', '.')
+        context['islr'] = str(self.object.islr).replace(',', '.')
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -202,4 +212,17 @@ def get_servicio_ajax(request):
         except Exception:
             data['error_message'] = 'error'
             return JsonResponse(data)
-        return JsonResponse(list(servicio.values('id', 'codigo')), safe = False)
+        result = list(servicio.values('id', 'codigo', 'actividad'))
+        result.append({'retiva':emp.retiva})
+        return JsonResponse(result, safe = False)
+
+def get_islr_ajax(request):
+    if request.method == "POST":
+        servicio_id = request.POST['servicio_id']
+        try:
+            servicio = Islr.objects.filter(id = servicio_id)
+        except Exception:
+            data['error_message'] = 'error'
+            return JsonResponse(data)
+        result = list(servicio.values('porcentaje', 'sustraendo'))
+        return JsonResponse(result, safe = False)

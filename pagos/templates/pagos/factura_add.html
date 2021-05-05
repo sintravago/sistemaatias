@@ -21,142 +21,220 @@
     </div>
   {% endfor %}
 {% endif %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Registrar Factura</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
 
-<div class="card card-primary">
+<section class="content">
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="row">
+      <div class="col-md-7">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title"> Detalle de la Factura</h3>
+          </div> 
+          <!-- /.card-header -->
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>{{ form.empresa.label }}</label> 
+                  {{ form.empresa }}
+                </div>
+                
+                <div class="form-group">
+                  <label>{{ form.nfactura.label }}</label> 
+                  {{ form.nfactura }}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.fechafactura.label }}</label> 
+                    <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                        {{ form.fechafactura }}
+                        <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="card-header">
-    <h3 class="card-title">Registrar Factura</h3>
-  </div> 
-  <!-- /.card-header -->
-  <div class="card-body">
-    <form method="post" enctype="multipart/form-data">{% csrf_token %}
-      <div class="row">
-        <div class="col-sm-4">
-          <div class="form-group">
-            <label>{{ form.empresa.label }}</label> 
-            {{ form.empresa }}
-          </div>
-          
-          <div class="form-group">
-            <label>{{ form.concepto.label }}</label> 
-            {{ form.concepto }}
-          </div>
+                <div class="form-group">
+                  <label>{{ form.concepto.label }}</label> 
+                  {{ form.concepto }}
+                </div>
 
-          <div class="form-group">
-            <label>{{ form.big.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.big }}
+                 <div class="form-group">
+                  <label>{{ form.archivo.label }}</label> 
+                  <div class="input-group">
+                    <div class="custom-file">
+                      {{ form.archivo }}
+                      <label class="custom-file-label" for="id_archivo">Seleccione un Archivo</label>
+                    </div>
+                  </div>  
+                </div>
+                
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>{{ form.tiposervicio.label }}</label> 
+                  <select class="form-control" name="tiposervicio" id="id_tiposervicio">
+                      <option selected disabled>Selecciona una empresa</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label>{{ form.ncontrol.label }}</label> 
+                  {{ form.ncontrol }}
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.fecharecepcion.label }}</label> 
+                    <div class="input-group date" id="reservationdate2" data-target-input="nearest">
+                        {{ form.fecharecepcion }}
+                        <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{ form.departamento.label }}</label> 
+                  {{ form.departamento }}
+                </div>
+
+              </div>
             </div>
-            <!-- /.input group -->
+            <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
+            <input type="hidden" name="retiva" id="id_retiva" value=0>
+            <input type="hidden" name="islr" id="id_islr" value=0>
+            <input type="hidden" name="sustraendo" id="id_sustraendo" value=0>
           </div>
-          <div class="form-group">
-            <label>{{ form.cambiofactura.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.cambiofactura }}
-            </div>
-            <!-- /.input group -->
-          </div>
-          <div class="form-group">
-            <label>{{ form.tiposervicio.label }}</label> 
-            <select class="form-control" name="tiposervicio" id="id_tiposervicio">
-                <option selected disabled>Selecciona un tipo de servicio</option>
-            </select>
-          </div>
+          <!-- /.card-body -->
         </div>
-        <div class="col-sm-4">
-          <div class="form-group">
-            <label>{{ form.nfactura.label }}</label> 
-            {{ form.nfactura }}
+        <!-- /.card -->
+      </div>
+      <div class="col-md-5">
+        <div class="card card-secondary">
+          <div class="card-header">
+              <h3 class="card-title">Montos de la Factura </h3>
           </div>
-          <div class="form-group">
-             <label>{{ form.fechafactura.label }}</label> 
-              <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                  {{ form.fechafactura }}
-                  <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                  </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+            <div class="form-group">
+              <label>{{ form.big.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button type="button" class="btn btn-secondary">BS</button>
+                </div>  
+                {{ form.big }}
               </div>
-          </div>
-          
-          <div class="form-group">
-            <label>{{ form.exento.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.exento }}
+              <!-- /.input group -->
             </div>
-            <!-- /.input group -->
-          </div>
-          <div class="form-group">
-            <label>{{ form.cambiopago.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.cambiopago }}
-            </div>
-            <!-- /.input group -->
-          </div>
 
-          <div class="form-group">
-            <label>{{ form.divisa.label }}</label> 
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span>
-              </div>  
-              {{ form.divisa }}
+            <div class="form-group">
+              <label>{{ form.exento.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button type="button" class="btn btn-secondary">BS</button>
+                </div>  
+                {{ form.exento }}
+              </div>
+              <!-- /.input group -->
             </div>
+
+            <hr/>
+            
+            <div class="form-group">
+              <label>{{ form.cambiofactura.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button type="button" class="btn btn-secondary">BS</button>
+                </div>  
+                {{ form.cambiofactura }}
+              </div>
+              <!-- /.input group -->
+            </div>
+
+            <div class="form-group">
+              <label>{{ form.cambiopago.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button type="button" class="btn btn-secondary">BS</button>
+                </div>  
+                {{ form.cambiopago }}
+              </div>
             <!-- /.input group -->
-          </div>
-         
-        </div>
-        <div class="col-sm-4">
-          <div class="form-group">
-            <label>{{ form.ncontrol.label }}</label> 
-            {{ form.ncontrol }}
-          </div>
-          <div class="form-group">
-             <label>{{ form.fecharecepcion.label }}</label> 
-              <div class="input-group date" id="reservationdate2" data-target-input="nearest">
-                  {{ form.fecharecepcion }}
-                  <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">
-                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                  </div>
+            </div>
+
+            <div class="form-group">
+              <label>{{ form.divisa.label }}</label> 
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button type="button" class="btn btn-secondary">USD</button>
+                </div>  
+                {{ form.divisa }}
               </div>
-          </div>
-           <div class="form-group">
-            <label>% {{ form.retiva.label }}</label> 
-            <div class="input-group">
-              {{ form.retiva }}
+              <!-- /.input group -->
             </div>
           </div>
-          <div class="form-group">
-            <label>{{ form.archivo.label }}</label> 
-            <div class="input-group">
-              <div class="custom-file">
-                {{ form.archivo }}
-                <label class="custom-file-label" for="id_archivo">Seleccione un Archivo</label>
-              </div>
-            </div>  
+                <!-- /.card-body -->
+          <div class="card-footer">
+            <table style="width:100%" class="table table-sm table-hover ">
+              <thead>
+                  <tr>
+                      <th>Concepto</th>
+                      <th style="text-align: right;">BS</th>
+                      <th style="text-align: right;">USD</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>IVA</td>
+                      <td style="text-align: right;"><label id = "id_iva"></label></td>
+                      <td></td>
+                  </tr>
+                  <tr>
+                      <th>Total Factura</th> 
+                      <th style="text-align: right;"><label id = "id_totalbs"></label></th>
+                      <th style="text-align: right;"><label id = "id_totalusd"></label></th>
+                  </tr>
+                  <tr>
+                      <td>Retención IVA</td> 
+                      <td style="text-align: right;"><label id = "id_calretiva"></label> </td>
+                      <td></td>
+                  </tr>
+                  <tr>
+                      <td>Retención ISLR</td> 
+                      <td style="text-align: right;"><label id = "id_calislr"></label></td>
+                      <td></td>
+                  </tr>
+                  <tr>
+                      <th>A pagar</th> 
+                      <th style="text-align: right;"><label id = "id_pagarbs"></label></th>
+                      <th style="text-align: right;"><label id = "id_pagarusd"></label></th>
+                  </tr>
+                  <tr>
+                      <th>Ajuste</th> 
+                      <th style="text-align: right;"><label id = "id_pagarbsr"></label></th>
+                      <th style="text-align: right;"><label id = "id_pagarusdr"></label></th>
+                  </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
-      <div class="btn-group float-right">
-        <input type="submit" class="btn btn-outline-success " value="Aceptar"/>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <input type="submit" class="btn btn-outline-success float-right" value="Aceptar"/>
       </div>
-    </form>
-  </div>
-  <!-- /.card-body -->
-</div>
-<!-- /.card -->
+    </div>
+  </form>
+</section>
 
 {% endblock %}
 
@@ -176,10 +254,51 @@
       $('.select2bs4').select2({
         theme: 'bootstrap4'
       });
-    })      
+    })   
+
+    function formatNumber(num) {
+      num = parseFloat(num).toFixed(2);
+      num = num.toString().replace('.',',');
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    }
+
+    function calculariva() {
+      iva = ({{ iva }} / 100) * parseFloat(document.getElementById("id_big").value)
+      totalbs = parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value) + iva
+      calretiva = iva * parseFloat(document.getElementById("id_retiva").value) / 100
+      calislr = ((parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value)) * parseFloat(document.getElementById("id_islr").value) / 100) - parseFloat(document.getElementById("id_sustraendo").value)
+      document.getElementById("id_iva").innerHTML = formatNumber(iva)
+      document.getElementById("id_totalbs").innerHTML = formatNumber(totalbs)
+      if (document.getElementById("id_cambiofactura").value == 0){
+        totalusd = 0
+      }else{
+        totalusd = totalbs / parseFloat(document.getElementById("id_cambiofactura").value)
+      }
+      document.getElementById("id_totalusd").innerHTML = formatNumber(totalusd)
+      document.getElementById("id_calretiva").innerHTML = formatNumber(calretiva)
+      document.getElementById("id_calislr").innerHTML = formatNumber(calislr)
+      if (document.getElementById("id_cambiofactura").value == 0 || document.getElementById("id_cambiopago").value == 0){
+        pagarusd = 0
+      } else {
+        pagarusd =  ((totalbs - calretiva - calislr) - (iva - calretiva)) / parseFloat(document.getElementById("id_cambiofactura").value)
+      }
+      document.getElementById("id_pagarusd").innerHTML = formatNumber(pagarusd)
+      if (document.getElementById("id_cambiopago").value == 0){
+        pagoenbs = totalbs - calretiva - calislr
+      }else{
+        pagoenbs = iva - calretiva
+        pagoenbsr = ((pagarusd - parseFloat(document.getElementById("id_divisa").value)) * document.getElementById("id_cambiopago").value) + (iva - calretiva)
+      }
+      document.getElementById("id_pagarbs").innerHTML = formatNumber(pagoenbs)
+      document.getElementById("id_pagarbsr").innerHTML = formatNumber(pagoenbsr)
+      document.getElementById("id_pagarusdr").innerHTML = formatNumber(document.getElementById("id_divisa").value)
+     
+    } 
+
+
   </script>
 
-  <script type="text/javascript">
+<script type="text/javascript">
   $(document).ready(function () {
     bsCustomFileInput.init();
   });
@@ -195,13 +314,38 @@
         'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function (data) {   // `data` is from `get_topics_ajax` view function
-        let html_data = '<option value="">---------</option>';
+        let html_data = '<option value="">Selecciona un tipo de servicio</option>';
         data.forEach(function (data) {
-            html_data += `<option value="${data.id}">${data.codigo}</option>`
+            if(data.id){
+              html_data += `<option value="${data.id}">${data.codigo} : ${data.actividad}</option>`
+            }else{
+              retiva = data.retiva;
+            }
         });
         $("#id_tiposervicio").html(html_data); // replace the contents of the topic input with the data that came from the server
+        $("#id_retiva").val(retiva);
       }
     });
+  });
+  $("#id_tiposervicio").change(function () {
+    const servicioId = $(this).val();  // get the selected subject ID from the HTML dropdown list 
+    $.ajax({                       // initialize an AJAX request
+      type: "POST",
+      url: '{% url "pagos:get_islr_ajax" %}',
+      data: {
+        'servicio_id': servicioId,       // add the country id to the POST parameters
+        'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function (data) {   // `data` is from `get_topics_ajax` view function
+        data.forEach(function (data) {
+            islr = data.porcentaje;
+            sustraendo = data.sustraendo;
+        });
+        $("#id_islr").val(islr); // replace the contents of the topic input with the data that came from the server
+        $("#id_sustraendo").val(sustraendo);
+      }
+    });
+    calculariva()
   });
 </script>
 {% endblock %}
