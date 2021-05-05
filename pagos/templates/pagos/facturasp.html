@@ -1,0 +1,150 @@
+{% extends "pagos/base.html" %}
+{% block title %} Facturas {% endblock %}
+{% load static %}
+{% load l10n %}
+{% block titulo %}  {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Facturas</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+    <form method="GET">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Facturas Clínica Atías</h3>
+                        
+                        <div class="card-tools">
+                            <div class="row">
+                                {%if request.user.is_staff %}
+                                    <div class = "col-6">
+                                        <div class="input-group input-group-sm" style="width: 300px;">
+                                            <select class="form-control" name="estatus" id="estatus" required>
+                                            <option value = "0"  >Todos</option>
+                                            <option value = "True"  {% if "True" == request.GET.estatus %} selected {% endif %}>Pagadas</option>
+                                            <option value = "False"  {% if "False" == request.GET.estatus %} selected {% endif %}>no Pagadas</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class = "col-6">
+                                    <div class="input-group input-group-sm" style="width: 300px;">
+                                        <input type="text" name="search" id="search" class="form-control float-right" placeholder="Buscar" value ="{{ request.GET.search }}">  
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table id="example1" class="table table-hover projects">
+                            <thead>
+                                <tr>
+                                    <th>RIF</th>                                
+                                    <th>Razón Soc.</th>                             
+                                    <th>Fecha/Recep.</th>
+                                    <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
+                                    <th>Fecha/Fact.</th>
+                                    <th>N° Factura</th>
+                                    <th>N° Control</th>
+                                    <th>Monto</th>
+                                    <th>Estatus</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for factura in object_list %}
+                                    <tr>
+                                        <td> {{ factura.empresa.rift }}-{{ factura.empresa.rif|unlocalize }} </td>
+                                        <td> {{ factura.empresa.razon }} </td>
+                                        <td> {{ factura.fecharecepcion|date:"d/m/Y" }} </td>
+                                        <td> {{factura.antiguedad.days}} </td>
+                                        <td> {{ factura.fechafactura|date:"d/m/Y" }} </td>
+                                        <td> {{ factura.nfactura }} </td>
+                                        <td> {{ factura.ncontrol }} </td>
+                                        <td> {{ factura.total|floatformat:2 }} </td>
+                                        {% for grupo in request.user.groups.all %}
+                                            {% if grupo.name == "nivel1" and  factura.estatus3 == False %}
+                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update3" factura.id|unlocalize %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                            {% else %}
+                                                <td> {% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan = 6>No hay Facturas aún.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        <ul class="pagination pagination-sm m-0 float-right">
+                            {% if page_obj.has_previous %}
+                            <li class="paginate_button page-item first">
+                                <a class="page-link" href="?page=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
+                            </li>
+                            <li class="paginate_button page-item previous">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="paginate_button page-item active">
+                                <a class="page-link" >Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</a>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="paginate_button page-item next">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="paginate_button page-item last">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        {% comment %} <a class="btn btn-outline-success float-left" href="{% url 'presupuestos:agremiado-add'%}"><i class="fas fa-plus-square mr-1"></i> Registrar Agremiado </a> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script>
+$(function () {
+    $('.select2bs4').select2({
+        theme: 'bootstrap4'
+    })
+})
+</script>
+{% endblock %}

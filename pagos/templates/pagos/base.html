@@ -249,7 +249,13 @@
               <li class="nav-item">
                 <a href="{% url 'pagos:facturas' %}" class="nav-link {% if 'facturas/' in request.path %} active {% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Buscar</p>
+                  <p>Registradas</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'pagos:facturasp' %}" class="nav-link {% if 'facturasp/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Procesadas</p>
                 </a>
               </li>
               {% for grupo in request.user.groups.all %}

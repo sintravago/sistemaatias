@@ -106,6 +106,35 @@ class FacturaListView(ListView):
             
         return object_list
 
+@method_decorator(login_required, name='dispatch')
+class FacturaspListView(ListView):
+    model = factura
+    template_name = 'pagos/facturasp.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.filter(estatus2 = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+        if "search" in self.request.GET:
+            name = self.request.GET['search']
+            if (name != ''):
+                if len(name.split()) > 1:
+                    for x in name.split():
+                        object_list = object_list.filter(empresa__razon__icontains = x)
+                else:
+                    object_list = object_list.filter(Q(empresa__razon__icontains = name) | Q(empresa__rif__icontains = name) | Q(suma__icontains = name) )
+        if "estatus" in self.request.GET:
+            if self.request.GET["estatus"] != "0" :
+                object_list = object_list.filter(estatus3 = self.request.GET["estatus"])
+        if "ord" in self.request.GET:
+            if self.request.GET["ord"] == "asc" :
+                object_list = object_list.order_by("fecharecepcion")
+            else:
+                object_list = object_list.order_by("-fecharecepcion")
+        else:
+            object_list = object_list.order_by("-fecharecepcion")
+            
+        return object_list
+
 def facturaStatusUpdate(request,pk):
     actualizar = factura.objects.get(pk = pk)
     if actualizar.estatus == True:
@@ -141,6 +170,22 @@ def facturaStatusUpdate2(request,pk):
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
     return redirect(reverse("pagos:facturas")+add)
+
+def facturaStatusUpdate3(request,pk):
+    actualizar = factura.objects.get(pk = pk)
+    if actualizar.estatus3 == False:
+        actualizar.estatus3 = True
+    actualizar.save()
+    add = "?suc=1"
+    if "search" in request.GET:
+        add += "&search=" + request.GET["search"]
+    if "ord" in request.GET:
+        add += "&ord=" + request.GET["ord"]
+    if "page" in request.GET:
+        add += "&page=" + request.GET["page"]
+    if "estatus" in request.GET:
+        add += "&estatus=" + request.GET["estatus"]
+    return redirect(reverse("pagos:facturasp")+add)
 
 @method_decorator(login_required, name='dispatch')
 class FacturaDetailView(DetailView):

@@ -88,6 +88,7 @@ class factura(models.Model):
     archivo = models.FileField(upload_to=user_directory_path, null=True,  blank=True)
     estatus = models.BooleanField(default=False)
     estatus2 = models.BooleanField(default=False)
+    estatus3 = models.BooleanField(default=False)
     tiposervicio = models.ForeignKey(Islr, verbose_name="Tipo de servicio", on_delete=models.PROTECT)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT)
 
