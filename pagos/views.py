@@ -174,7 +174,7 @@ def facturaStatusUpdate(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
-    if "departamento" in self.request.GET:
+    if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
 
     return redirect(reverse("pagos:facturas")+add)
@@ -195,7 +195,7 @@ def facturaStatusUpdate2(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
-    if "departamento" in self.request.GET:
+    if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
 
     return redirect(reverse("pagos:facturas")+add)
@@ -214,7 +214,7 @@ def facturaStatusUpdate3(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
-    if "departamento" in self.request.GET:
+    if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
     return redirect(reverse("pagos:facturasp")+add)
 
