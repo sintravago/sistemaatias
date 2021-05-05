@@ -9,6 +9,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .forms import FacturaForm, EmpresaForm, ivaUpdateForm, FacturaEditForm
 from .models import factura, Empresa, iva, Islr
+from registration.models import departamento
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
 from django.http import JsonResponse
@@ -96,6 +97,11 @@ class FacturaListView(ListView):
                     object_list = object_list.filter(estatus2 = self.request.GET["estatus"])
                 else:
                     object_list = object_list.filter(estatus = self.request.GET["estatus"])
+        
+        if "departamento" in self.request.GET:
+            if self.request.GET["departamento"] != "0":
+                object_list = object_list.filter(departamento__id = self.request.GET["departamento"] )
+
         if "ord" in self.request.GET:
             if self.request.GET["ord"] == "asc" :
                 object_list = object_list.order_by("fecharecepcion")
@@ -103,8 +109,15 @@ class FacturaListView(ListView):
                 object_list = object_list.order_by("-fecharecepcion")
         else:
             object_list = object_list.order_by("-fecharecepcion")
+        
+        
             
         return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) 
+        context['departamentos'] = departamento.objects.all()
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class FacturaspListView(ListView):
@@ -125,6 +138,11 @@ class FacturaspListView(ListView):
         if "estatus" in self.request.GET:
             if self.request.GET["estatus"] != "0" :
                 object_list = object_list.filter(estatus3 = self.request.GET["estatus"])
+        
+        if "departamento" in self.request.GET:
+            if self.request.GET["departamento"] != "0":
+                object_list = object_list.filter(departamento__id = self.request.GET["departamento"] )
+
         if "ord" in self.request.GET:
             if self.request.GET["ord"] == "asc" :
                 object_list = object_list.order_by("fecharecepcion")
@@ -134,6 +152,11 @@ class FacturaspListView(ListView):
             object_list = object_list.order_by("-fecharecepcion")
             
         return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) 
+        context['departamentos'] = departamento.objects.all()
+        return context
 
 def facturaStatusUpdate(request,pk):
     actualizar = factura.objects.get(pk = pk)
@@ -151,6 +174,9 @@ def facturaStatusUpdate(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
+    if "departamento" in self.request.GET:
+        add += "&departamento=" + request.GET["departamento"]
+
     return redirect(reverse("pagos:facturas")+add)
 
 def facturaStatusUpdate2(request,pk):
@@ -169,6 +195,9 @@ def facturaStatusUpdate2(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
+    if "departamento" in self.request.GET:
+        add += "&departamento=" + request.GET["departamento"]
+
     return redirect(reverse("pagos:facturas")+add)
 
 def facturaStatusUpdate3(request,pk):
@@ -185,6 +214,8 @@ def facturaStatusUpdate3(request,pk):
         add += "&page=" + request.GET["page"]
     if "estatus" in request.GET:
         add += "&estatus=" + request.GET["estatus"]
+    if "departamento" in self.request.GET:
+        add += "&departamento=" + request.GET["departamento"]
     return redirect(reverse("pagos:facturasp")+add)
 
 @method_decorator(login_required, name='dispatch')

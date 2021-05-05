@@ -19,7 +19,7 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <h1>Facturas</h1>
+        <h1>Facturas Procesadas</h1>
       </div>
     </div>
   </div><!-- /.container-fluid -->
@@ -34,19 +34,27 @@
                         
                         <div class="card-tools">
                             <div class="row">
-                                {%if request.user.is_staff %}
-                                    <div class = "col-6">
-                                        <div class="input-group input-group-sm" style="width: 300px;">
-                                            <select class="form-control" name="estatus" id="estatus" required>
-                                            <option value = "0"  >Todos</option>
-                                            <option value = "True"  {% if "True" == request.GET.estatus %} selected {% endif %}>Pagadas</option>
-                                            <option value = "False"  {% if "False" == request.GET.estatus %} selected {% endif %}>no Pagadas</option>
-                                            </select>
-                                        </div>
+                                <div class = "col-4">
+                                    <div class="input-group input-group-sm" style="width: 200px;">
+                                        <select class="form-control" name="departamento" id="departamento" required>
+                                        <option value = "0">Todos</option>
+                                        {% for dep in departamentos %}
+                                            <option value = {{dep.pk}} {% if dep.pk|floatformat == request.GET.departamento|floatformat %} selected {% endif %}>{{dep}}</option>
+                                        {% endfor %}
+                                        </select>
                                     </div>
-                                {% endif %}
-                                <div class = "col-6">
-                                    <div class="input-group input-group-sm" style="width: 300px;">
+                                </div>
+                                <div class = "col-4">
+                                    <div class="input-group input-group-sm" style="width: 200px;">
+                                        <select class="form-control" name="estatus" id="estatus" required>
+                                        <option value = "0"  >Todos</option>
+                                        <option value = "True"  {% if "True" == request.GET.estatus %} selected {% endif %}>Pagadas</option>
+                                        <option value = "False"  {% if "False" == request.GET.estatus %} selected {% endif %}>no Pagadas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class = "col-4">
+                                    <div class="input-group input-group-sm" style="width: 200px;">
                                         <input type="text" name="search" id="search" class="form-control float-right" placeholder="Buscar" value ="{{ request.GET.search }}">  
                                         <div class="input-group-append">
                                             <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
@@ -64,7 +72,7 @@
                                     <th>RIF</th>                                
                                     <th>Razón Soc.</th>                             
                                     <th>Fecha/Recep.</th>
-                                    <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
+                                    <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
                                     <th>Fecha/Fact.</th>
                                     <th>N° Factura</th>
                                     <th>N° Control</th>
@@ -86,7 +94,7 @@
                                         <td> {{ factura.total|floatformat:2 }} </td>
                                         {% for grupo in request.user.groups.all %}
                                             {% if grupo.name == "nivel1" and  factura.estatus3 == False %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update3" factura.id|unlocalize %}?suc=0{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update3" factura.id|unlocalize %}?suc=0{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                             {% else %}
                                                 <td> {% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
                                             {% endif %}
@@ -106,10 +114,10 @@
                         <ul class="pagination pagination-sm m-0 float-right">
                             {% if page_obj.has_previous %}
                             <li class="paginate_button page-item first">
-                                <a class="page-link" href="?page=1{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
+                                <a class="page-link" href="?page=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
                             </li>
                             <li class="paginate_button page-item previous">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
                             </li>
                             {% endif %}
                             
@@ -119,10 +127,10 @@
 
                             {% if page_obj.has_next %}
                             <li class="paginate_button page-item next">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
                             </li>
                             <li class="paginate_button page-item last">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
                             </li>
                             {% endif %}
                         </ul>
