@@ -84,17 +84,17 @@ WSGI_APPLICATION = 'horario.wsgi.application'
 # }
 
 DATABASES = {
-      'default': {
-         'ENGINE': 'sql_server.pyodbc',
-          'NAME': 'CONASIS',
-          'USER': 'conasis',
-          'PASSWORD': 'zxasqw123*',
-          'HOST': '192.168.0.7',
-          'PORT': '1433',
-          'OPTIONS': {
-              'driver': 'ODBC Driver 17 for SQL Server',
-          }
-      }
+    'default': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'CONASIS',
+        'USER': 'conasis',
+        'PASSWORD': 'zxasqw123*',
+        'HOST': '192.168.0.7',
+        'PORT': '1433',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        }
+    }
 }
 
 # Password validation
