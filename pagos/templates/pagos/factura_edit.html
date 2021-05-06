@@ -104,6 +104,10 @@
                   {{ form.departamento }}
                 </div>
 
+                <div class="form-group">
+                  <label>{{ form.tipo.label }}</label> 
+                  {{ form.tipo }}
+                </div>
               </div>
             </div>
             <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
@@ -197,7 +201,7 @@
                       <td></td>
                   </tr>
                   <tr>
-                      <th>Total Factura</th> 
+                      <th>Total Factura (Equivalente)</th> 
                       <th style="text-align: right;"><label id = "id_totalbs">{{ object.total|floatformat:2 }}</label></th>
                       <th style="text-align: right;"><label id = "id_totalusd">{{ object.totalusd|floatformat:2 }}</label></th>
                   </tr>
@@ -212,7 +216,7 @@
                       <td></td>
                   </tr>
                   <tr>
-                      <th>A pagar</th> 
+                      <th>Total a Pagar en </th> 
                       <th style="text-align: right;"><label id = "id_pagarbs">{{ object.totalbs|floatformat:2 }}</label></th>
                       <th style="text-align: right;"><label id = "id_pagarusd">{{ object.pagousd|floatformat:2 }}</label></th>
                   </tr>

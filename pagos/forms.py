@@ -18,42 +18,58 @@ class EmpresaForm(forms.ModelForm):
 class FacturaForm(forms.ModelForm):
     class Meta:
         model = factura
-        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago', 'tiposervicio','divisa', 'retiva', 'departamento']
+        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago', 'tiposervicio','divisa', 'retiva', 'departamento', 'tipo']
         widgets = {
             'nfactura': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número de factura'}),
             'ncontrol': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número de control'}),
             'fechafactura': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Factura', 'data-target':'#reservationdate'}),
             'fecharecepcion': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Recepción', 'data-target':'#reservationdate2'}),
             'concepto': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Concepto'}),
-            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'exento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Exento', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'cambiofactura': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Factura', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'cambiopago': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Pago', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
+            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'exento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Exento', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'cambiofactura': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Factura', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'cambiopago': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Pago', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
             'archivo': forms.FileInput(attrs={'class':'custom-file-input'}),
             'empresa': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
             'tiposervicio': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
-            'divisa': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en USD', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
+            'divisa': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
             'departamento': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+            'tipo': forms.Select(attrs={'class':'form-control', 'style':'width: 100%;'}),
         }
+
+    def clean_nfactura(self):
+        nrofactura = self.cleaned_data.get("nfactura")
+        empresa = self.cleaned_data.get("empresa")
+        if factura.objects.filter(empresa=empresa,nfactura=nrofactura).exists():
+            raise forms.ValidationError("La Número de factura ya está registrada")
+        return nrofactura
+    
+    def clean_ncontrol(self):
+        ncontrol = self.cleaned_data.get("ncontrol")
+        empresa = self.cleaned_data.get("empresa")
+        if factura.objects.filter(empresa=empresa,ncontrol=ncontrol).exists():
+            raise forms.ValidationError("La Número de control ya está registrado")
+        return ncontrol
 
 class FacturaEditForm(forms.ModelForm):
     class Meta:
         model = factura
-        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago', 'tiposervicio','divisa', 'retiva', 'departamento']
+        fields = ['empresa','user','nfactura','ncontrol','fechafactura', 'fecharecepcion', 'concepto', 'big', 'exento', 'archivo', 'cambiofactura', 'cambiopago', 'tiposervicio','divisa', 'retiva', 'departamento','tipo']
         widgets = {
             'nfactura': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número de factura'}),
             'ncontrol': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Número de control'}),
             'fechafactura': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Factura', 'data-target':'#reservationdate'}),
             'fecharecepcion': forms.DateInput (attrs={'class':'form-control datetimepicker-input', 'placeholder':'Fecha de Recepción', 'data-target':'#reservationdate2'}),
             'concepto': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Concepto'}),
-            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'exento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Exento', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'cambiofactura': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Factura', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
-            'cambiopago': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Pago', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
+            'big': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'BIG', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'exento': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Exento', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'cambiofactura': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Factura', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
+            'cambiopago': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Cambio Pago', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
             'empresa': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
             'tiposervicio': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
-            'divisa': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en USD', 'step':'.01', 'min':'0', 'onkeyup':'calculariva()'}),
+            'divisa': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculariva()'}),
             'departamento': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+            'tipo': forms.Select(attrs={'class':'form-control', 'style':'width: 100%;'}),
         }
 
 

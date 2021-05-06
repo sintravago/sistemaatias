@@ -13,6 +13,10 @@ from registration.models import departamento
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
 from django.http import JsonResponse
+from easy_pdf.views import PDFTemplateView
+from django.conf import settings
+from datetime import datetime
+import django_excel as excel
 
 # Create your views here.
 
@@ -82,7 +86,7 @@ class FacturaListView(ListView):
         elif grupo2 in self.request.user.groups.all():
             object_list = self.model.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         elif grupo3 in self.request.user.groups.all():
-            object_list = self.model.objects.filter(estatus = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+            object_list = self.model.objects.filter(estatus = True, estatus2 = False, estatus3 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         if "search" in self.request.GET:
             name = self.request.GET['search']
             if (name != ''):
@@ -110,13 +114,40 @@ class FacturaListView(ListView):
         else:
             object_list = object_list.order_by("-fecharecepcion")
         
+        if "tipo" in self.request.GET:
+            if self.request.GET["tipo"] == "1":
+                object_list = object_list.filter(tipo__in = ['alm','dir'] )
+            elif self.request.GET["tipo"] != "0":
+                object_list = object_list.filter(tipo = self.request.GET["tipo"])
         
-            
+        if "reservation" in self.request.GET:
+            desde, hasta = self.request.GET["reservation"].split("-")
+            desde = desde.replace(' ','')
+            hasta = hasta.replace(' ','')
+            desde = datetime.strptime(desde, '%d/%m/%Y')
+            hasta = datetime.strptime(hasta, '%d/%m/%Y')
+            object_list = object_list.filter(fecharecepcion__gte = desde, fecharecepcion__lte = hasta)
         return object_list
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) 
         context['departamentos'] = departamento.objects.all()
+        context['tipos'] = []
+        for tipo in factura.choise_tipo:
+            context['tipos'].append({'id':tipo[0],'value':tipo[1]})
+        totalbs = 0
+        totalusd = 0
+        pagobs = 0
+        pagousd = 0
+        for fact in context['object_list']:
+            totalbs += fact.total()
+            totalusd += fact.totalusd()
+            pagobs += fact.pagoenbs()
+            pagousd += fact.divisa
+        context['totalbs'] = totalbs
+        context['totalusd'] = totalusd
+        context['pagobs'] = pagobs
+        context['pagousd'] = pagousd
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -126,7 +157,7 @@ class FacturaspListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        object_list = self.model.objects.filter(estatus2 = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+        object_list = self.model.objects.filter(estatus2 = True, estatus3 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
         if "search" in self.request.GET:
             name = self.request.GET['search']
             if (name != ''):
@@ -135,9 +166,6 @@ class FacturaspListView(ListView):
                         object_list = object_list.filter(empresa__razon__icontains = x)
                 else:
                     object_list = object_list.filter(Q(empresa__razon__icontains = name) | Q(empresa__rif__icontains = name) | Q(suma__icontains = name) )
-        if "estatus" in self.request.GET:
-            if self.request.GET["estatus"] != "0" :
-                object_list = object_list.filter(estatus3 = self.request.GET["estatus"])
         
         if "departamento" in self.request.GET:
             if self.request.GET["departamento"] != "0":
@@ -150,12 +178,95 @@ class FacturaspListView(ListView):
                 object_list = object_list.order_by("-fecharecepcion")
         else:
             object_list = object_list.order_by("-fecharecepcion")
+
+        if "reservation" in self.request.GET:
+            desde, hasta = self.request.GET["reservation"].split("-")
+            desde = desde.replace(' ','')
+            hasta = hasta.replace(' ','')
+            desde = datetime.strptime(desde, '%d/%m/%Y')
+            hasta = datetime.strptime(hasta, '%d/%m/%Y')
+            object_list = object_list.filter(fecharecepcion__gte = desde, fecharecepcion__lte = hasta)
+        return object_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) 
+        context['departamentos'] = departamento.objects.all()
+        context['tipos'] = []
+        for tipo in factura.choise_tipo:
+            context['tipos'].append({'id':tipo[0],'value':tipo[1]})
+        totalbs = 0
+        totalusd = 0
+        pagobs = 0
+        pagousd = 0
+        for fact in context['object_list']:
+            totalbs += fact.total()
+            totalusd += fact.totalusd()
+            pagobs += fact.pagoenbs()
+            pagousd += fact.divisa
+        context['totalbs'] = totalbs
+        context['totalusd'] = totalusd
+        context['pagobs'] = pagobs
+        context['pagousd'] = pagousd
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class FacturasppListView(ListView):
+    model = factura
+    template_name = 'pagos/facturaspp.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.filter(estatus3 = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+        if "search" in self.request.GET:
+            name = self.request.GET['search']
+            if (name != ''):
+                if len(name.split()) > 1:
+                    for x in name.split():
+                        object_list = object_list.filter(empresa__razon__icontains = x)
+                else:
+                    object_list = object_list.filter(Q(empresa__razon__icontains = name) | Q(empresa__rif__icontains = name) | Q(suma__icontains = name) )
+        
+        if "departamento" in self.request.GET:
+            if self.request.GET["departamento"] != "0":
+                object_list = object_list.filter(departamento__id = self.request.GET["departamento"] )
+
+        if "ord" in self.request.GET:
+            if self.request.GET["ord"] == "asc" :
+                object_list = object_list.order_by("fecharecepcion")
+            else:
+                object_list = object_list.order_by("-fecharecepcion")
+        else:
+            object_list = object_list.order_by("-fecharecepcion")
+
+        if "reservation" in self.request.GET:
+            desde, hasta = self.request.GET["reservation"].split("-")
+            desde = desde.replace(' ','')
+            hasta = hasta.replace(' ','')
+            desde = datetime.strptime(desde, '%d/%m/%Y')
+            hasta = datetime.strptime(hasta, '%d/%m/%Y')
+            object_list = object_list.filter(fechapago__gte = desde, fechapago__lte = hasta)
             
         return object_list
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) 
         context['departamentos'] = departamento.objects.all()
+        context['tipos'] = []
+        for tipo in factura.choise_tipo:
+            context['tipos'].append({'id':tipo[0],'value':tipo[1]})
+        totalbs = 0
+        totalusd = 0
+        pagobs = 0
+        pagousd = 0
+        for fact in context['object_list']:
+            totalbs += fact.total()
+            totalusd += fact.totalusd()
+            pagobs += fact.pagoenbs()
+            pagousd += fact.divisa
+        context['totalbs'] = totalbs
+        context['totalusd'] = totalusd
+        context['pagobs'] = pagobs
+        context['pagousd'] = pagousd
         return context
 
 def facturaStatusUpdate(request,pk):
@@ -176,7 +287,9 @@ def facturaStatusUpdate(request,pk):
         add += "&estatus=" + request.GET["estatus"]
     if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
-
+    if "tipo" in request.GET:
+        add += "&tipo=" + request.GET["tipo"]    
+    
     return redirect(reverse("pagos:facturas")+add)
 
 def facturaStatusUpdate2(request,pk):
@@ -193,18 +306,24 @@ def facturaStatusUpdate2(request,pk):
         add += "&ord=" + request.GET["ord"]
     if "page" in request.GET:
         add += "&page=" + request.GET["page"]
-    if "estatus" in request.GET:
-        add += "&estatus=" + request.GET["estatus"]
     if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
+    if "tipo" in request.GET:
+        add += "&tipo=" + request.GET["tipo"]
 
-    return redirect(reverse("pagos:facturas")+add)
+    if request.GET["suc"] == "1":
+        return redirect(reverse("pagos:facturasp")+add)
+    else:
+        return redirect(reverse("pagos:facturas")+add)
 
 def facturaStatusUpdate3(request,pk):
     actualizar = factura.objects.get(pk = pk)
     if actualizar.estatus3 == False:
+        today    = datetime.now()
+        strToday = today.strftime("%Y-%m-%d")
         actualizar.estatus3 = True
-    actualizar.save()
+        actualizar.fechapago = strToday
+        actualizar.save()
     add = "?suc=1"
     if "search" in request.GET:
         add += "&search=" + request.GET["search"]
@@ -212,10 +331,10 @@ def facturaStatusUpdate3(request,pk):
         add += "&ord=" + request.GET["ord"]
     if "page" in request.GET:
         add += "&page=" + request.GET["page"]
-    if "estatus" in request.GET:
-        add += "&estatus=" + request.GET["estatus"]
     if "departamento" in request.GET:
         add += "&departamento=" + request.GET["departamento"]
+    if "tipo" in request.GET:
+        add += "&tipo=" + request.GET["tipo"]
     return redirect(reverse("pagos:facturasp")+add)
 
 @method_decorator(login_required, name='dispatch')
@@ -302,3 +421,136 @@ def get_islr_ajax(request):
             return JsonResponse(data)
         result = list(servicio.values('porcentaje', 'sustraendo'))
         return JsonResponse(result, safe = False)
+
+class FacturaPDFView(PDFTemplateView):
+    template_name = 'pagos/facturapdf.html'
+
+    base_url = 'file://' + settings.STATIC_ROOT
+
+    def get_context_data(self, **kwargs):
+        fact = factura.objects.get(pk=kwargs['pk'])
+        return super(FacturaPDFView, self).get_context_data(
+            factura = fact,
+            pagesize='letter',
+            title='Presupuesto',
+            **kwargs
+        )
+
+@login_required
+def exportarfacturas(request):
+    export = []
+    if request.GET:
+        if request.GET["export"] == "1":
+            grupo1 = Group.objects.get(name="nivel1")
+            grupo2 = Group.objects.get(name="nivel2")
+            grupo3 = Group.objects.get(name="nivel3")
+            if grupo1 in request.user.groups.all():
+                object_list = factura.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+            elif grupo2 in request.user.groups.all():
+                object_list = factura.objects.filter(estatus2 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+            elif grupo3 in request.user.groups.all():
+                object_list = factura.objects.filter(estatus = True, estatus2 = False, estatus3 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+        elif request.GET["export"] == "2":
+            object_list = factura.objects.filter(estatus2 = True, estatus3 = False).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+        else:
+            object_list = factura.objects.filter(estatus3 = True).annotate(suma=Sum(F('big') + F('iva') + F('exento')))
+
+        if "search" in request.GET:
+            name = request.GET['search']
+            if (name != ''):
+                if len(name.split()) > 1:
+                    for x in name.split():
+                        object_list = object_list.filter(empresa__razon__icontains = x)
+                else:
+                    object_list = object_list.filter(Q(empresa__razon__icontains = name) | Q(empresa__rif__icontains = name) | Q(suma__icontains = name) )
+        if "estatus" in request.GET:
+            if request.GET["estatus"] != "0" :
+                if grupo3 in request.user.groups.all():
+                    object_list = object_list.filter(estatus2 = self.request.GET["estatus"])
+                else:
+                    object_list = object_list.filter(estatus = self.request.GET["estatus"])
+        
+        if "departamento" in request.GET:
+            if request.GET["departamento"] != "0":
+                object_list = object_list.filter(departamento__id = self.request.GET["departamento"] )
+
+        if "ord" in request.GET:
+            if request.GET["ord"] == "asc" :
+                object_list = object_list.order_by("fecharecepcion")
+            else:
+                object_list = object_list.order_by("-fecharecepcion")
+        else:
+            object_list = object_list.order_by("-fecharecepcion")
+        
+        if "tipo" in request.GET:
+            if request.GET["tipo"] == "1":
+                object_list = object_list.filter(tipo__in = ['alm','dir'] )
+            elif request.GET["tipo"] != "0":
+                object_list = object_list.filter(tipo = self.request.GET["tipo"])
+        
+        if "reservation" in request.GET:
+            desde, hasta = request.GET["reservation"].split("-")
+            desde = desde.replace(' ','')
+            hasta = hasta.replace(' ','')
+            desde = datetime.strptime(desde, '%d/%m/%Y')
+            hasta = datetime.strptime(hasta, '%d/%m/%Y')
+            object_list = object_list.filter(fecharecepcion__gte = desde, fecharecepcion__lte = hasta)
+        
+        export.append([
+            'RIF',
+            'Razón Social',
+            'Clasificación',
+            'Tlf',
+            'Dirección',
+            'N° de Factura',
+            'N° de Control',
+            'Departamento',
+            'Fecha de Factura',
+            'Fecha de Recepción',
+            'Fecha de Pago',
+            'Concepto',
+            'Tipo de Factura',
+            'Tipo de Servicio',
+            'Tipo de Cambio (Factura)',
+            'Tipo de Cambio (Fecha de Pago)',
+            'BIG',
+            'Exento',
+            'IVA',
+            'Total Factura en BS',
+            'Total Factura en USD',
+            'Retención IVA',
+            'Retención ISLR',
+            'Pago en BS',
+            'Pago en USD',
+        ])
+
+        for fact in object_list:
+           export.append([
+                "{}-{}".format(fact.empresa.rift, fact.empresa.rif),
+                fact.empresa.razon,
+                fact.empresa.clasificacion,
+                fact.empresa.tlf,
+                fact.empresa.direccion,
+                fact.nfactura,
+                fact.ncontrol,
+                fact.departamento.nombre,
+                fact.fechafactura,
+                fact.fecharecepcion,
+                fact.fechapago,
+                fact.concepto,
+                fact.get_tipo_display(),
+                "{}: {}".format(fact.tiposervicio.codigo, fact.tiposervicio.actividad),
+                fact.cambiofactura,
+                fact.cambiopago,
+                fact.big,
+                fact.exento,
+                fact.caliva(),
+                fact.total(),
+                fact.totalusd(),
+                fact.calretiva(),
+                fact.calislr(),
+                fact.pagoenbs(),
+                fact.divisa,
+            ]) 
+    sheet = excel.pe.Sheet(export)
+    return excel.make_response(sheet, "xlsx", file_name="reporte_excel")

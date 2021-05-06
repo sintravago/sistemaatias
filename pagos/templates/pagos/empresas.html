@@ -1,5 +1,5 @@
 {% extends "pagos/base.html" %}
-{% block title %} Empresas {% endblock %}
+{% block title %} Proveedores {% endblock %}
 {% load static %}
 {% load l10n %}
 {% block head %} 
@@ -15,7 +15,7 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <h1>Buscar Empresa</h1>
+        <h1>Buscar Proveedor</h1>
       </div>
     </div>
   </div><!-- /.container-fluid -->
@@ -26,7 +26,7 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Empresas Clínica Atías</h3>
+                        <h3 class="card-title">Proveedores Clínica Atías</h3>
                         
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -62,7 +62,7 @@
                                     </tr>
                                 {% empty %}
                                     <tr>
-                                        <td colspan = 4>No hay Empresas aún.</td>
+                                        <td colspan = 4>No hay Proveedores aún.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

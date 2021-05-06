@@ -132,7 +132,6 @@
                                     <th>N° Factura</th>
                                     <th>N° Control</th>
                                     <th>Monto</th>
-                                    <th>Estatus</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -147,15 +146,6 @@
                                         <td> {{ factura.nfactura }} </td>
                                         <td> {{ factura.ncontrol }} </td>
                                         <td> {{ factura.total|floatformat:2 }} </td>
-                                        {% for grupo in request.user.groups.all %}
-                                            {% if grupo.name == "nivel1" and  factura.estatus3 == False %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update3" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus3 == False %}<i class="fas fa-handshake">{% else %}<i class="fas fa-check-circle">{% endif %}</i> Pagar</a> </td>
-                                            {% elif grupo.name == "nivel3" and  factura.estatus3 == False %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id|unlocalize %}?suc=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-lock">{% else %}<i class="fas fa-lock-open">{% endif %}</i></a> </td>
-                                            {% else %}
-                                                <td> {% if factura.estatus3 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
-                                            {% endif %}
-                                        {% endfor %}
                                         <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
                                     </tr>
                                 {% empty %}
@@ -198,7 +188,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <a target="_blank" href="{% url "pagos:exportar"%}?export=2{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}" class="btn btn-outline-secondary ">Exportar</a>
+                <a target="_blank" href="{% url "pagos:exportar"%}?export=3{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}" class="btn btn-outline-secondary ">Exportar</a>
             </div>
         </div>
     </form>

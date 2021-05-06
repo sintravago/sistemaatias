@@ -27,14 +27,77 @@
 <section class="content">
     <form method="GET">
         <div class="row">
+            <div class="col-12 col-sm-3">
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text text-center text-muted">Total BS</span>
+                        <span class="info-box-number text-center text-muted mb-0">{{ totalbs|floatformat:2 }}</span>
+                    </div>  
+                </div>
+            </div>
+            <div class="col-12 col-sm-3">
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text text-center text-muted">Total USD</span>
+                        <span class="info-box-number text-center text-muted mb-0">{{ totalusd|floatformat:2 }}</span>
+                    </div>  
+                </div>
+            </div>
+            <div class="col-12 col-sm-3">
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text text-center text-muted">A pagar en BS</span>
+                        <span class="info-box-number text-center text-muted mb-0">{{ pagobs|floatformat:2 }}</span>
+                    </div>  
+                </div>
+            </div>
+            <div class="col-12 col-sm-3">
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text text-center text-muted">A pagar en USD</span>
+                        <span class="info-box-number text-center text-muted mb-0">{{ pagousd|floatformat:2 }}</span>
+                    </div>  
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 col-sm-4">
+                <div class="form-group">
+                    <label>Fecha (desde-hasta):</label>
+                    <div class="input-group ">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <input type="checkbox" id="id_check" {% if request.GET.reservation %} checked {% endif %}>
+                            </span>
+                        </div>
+                        
+                        <input {% if not request.GET.reservation %} disabled {% endif %} type="text" class="form-control float-right" id="reservation" name="reservation" value = "{% if request.GET.reservation %}{{ request.GET.reservation }}{% endif %}">
+
+                    </div>
+                    <!-- /.input group -->
+                </div>
+            </div>
+            
+        </div>
+        <div class="row">
             <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Facturas Clínica Atías</h3>
-                        
                         <div class="card-tools">
                             <div class="row">
-                                <div class = "col-4">
+                                <div class = "col-3">
+                                    <div class="input-group input-group-sm" style="width: 200px;">
+                                        <select class="form-control" name="tipo" id="tipo" required>
+                                        <option value = "0" {% if "0" == request.GET.tipo %} selected {% endif %} >Todos</option>
+                                        <option value = "1" {% if "1" == request.GET.tipo %} selected {% endif %}>Compras</option>
+                                        {% for tipo in tipos %}
+                                            <option value = {{tipo.id}} {% if tipo.id == request.GET.tipo %} selected {% endif %}>{{tipo.value}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class = "col-3">
                                     <div class="input-group input-group-sm" style="width: 200px;">
                                         <select class="form-control" name="departamento" id="departamento" required>
                                         <option value = "0">Todos</option>
@@ -44,7 +107,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class = "col-4">
+                                <div class = "col-3">
                                     <div class="input-group input-group-sm" style="width: 200px;">
                                         <select class="form-control" name="estatus" id="estatus" required>
                                         <option value = "0"  >Todos</option>
@@ -53,7 +116,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class = "col-4">
+                                <div class = "col-3">
                                     <div class="input-group input-group-sm" style="width: 200px;">
                                         <input type="text" name="search" id="search" class="form-control float-right" placeholder="Buscar" value ="{{ request.GET.search }}">  
                                         <div class="input-group-append">
@@ -72,7 +135,7 @@
                                     <th>RIF</th>                                
                                     <th>Razón Soc.</th>                             
                                     <th>Fecha/Recep.</th>
-                                    <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
+                                    <th> <a href="{% url "pagos:facturas" %}?suc=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}{% if request.GET.ord == "asc" %}&ord=desc">Ant.<i class="fas fa-angle-down"></i>{% else %}&ord=asc">Ant.<i class="fas fa-angle-up"></i>{% endif %}</a></th>
                                     <th>Fecha/Fact.</th>
                                     <th>N° Factura</th>
                                     <th>N° Control</th>
@@ -94,11 +157,11 @@
                                         <td> {{ factura.total|floatformat:2 }} </td>
                                         {% for grupo in request.user.groups.all %}
                                             {% if grupo.name == "nivel2" %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update" factura.id|unlocalize %}?suc=0{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                             {% elif grupo.name == "nivel1" %}
                                                 <td> {% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
                                             {% else %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id|unlocalize %}?suc=0{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-lock">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
                                             {% endif %}
                                         {% endfor %}
                                         <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
@@ -116,10 +179,10 @@
                         <ul class="pagination pagination-sm m-0 float-right">
                             {% if page_obj.has_previous %}
                             <li class="paginate_button page-item first">
-                                <a class="page-link" href="?page=1{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
+                                <a class="page-link" href="?page=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
                             </li>
                             <li class="paginate_button page-item previous">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
                             </li>
                             {% endif %}
                             
@@ -129,16 +192,21 @@
 
                             {% if page_obj.has_next %}
                             <li class="paginate_button page-item next">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
                             </li>
                             <li class="paginate_button page-item last">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
                             </li>
                             {% endif %}
                         </ul>
                         {% comment %} <a class="btn btn-outline-success float-left" href="{% url 'presupuestos:agremiado-add'%}"><i class="fas fa-plus-square mr-1"></i> Registrar Agremiado </a> {% endcomment %}
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <a target="_blank" href="{% url "pagos:exportar"%}?export=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}" class="btn btn-outline-secondary ">Exportar</a>
             </div>
         </div>
     </form>
@@ -150,11 +218,52 @@
 <script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'core/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'core/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script src="{% static 'core/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'core/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+
 <script>
 $(function () {
     $('.select2bs4').select2({
         theme: 'bootstrap4'
     })
+
+    $('#id_check').on('click',function(){
+        if (this.checked){
+            $("#reservation").attr('disabled', false);
+        }else{
+            $("#reservation").attr('disabled', true);
+        }
+        
+    })
 })
+    $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      //Date range picker
+      $('#reservation').daterangepicker({
+        
+        locale: {
+          format: 'DD/MM/YYYY',
+          monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+          monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
+          dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+          dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+        }
+      })
+      //Date range picker with time picker
+      $('#reservationtime').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 30,
+            locale: {
+            format: 'DD/MM/YYYY hh:mm A'
+            }
+        })
+
+    
+
 </script>
 {% endblock %}

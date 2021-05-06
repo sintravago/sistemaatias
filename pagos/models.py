@@ -67,14 +67,21 @@ class Empresa(models.Model):
         return "{} ({}-{})".format(self.razon, self.rift, self.rif)
 
 class factura(models.Model):
+    choise_tipo = [
+        ('ser', 'Servicio'),
+        ('alm', 'Compra de almacén'),
+        ('dir', 'Compra directa'),
+    ]
+
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
-    empresa = models.ForeignKey(Empresa, verbose_name="Empresa", on_delete=models.PROTECT)
+    empresa = models.ForeignKey(Empresa, verbose_name="Proveedor", on_delete=models.PROTECT)
     nfactura = models.CharField(max_length=150, verbose_name='Número de Factura')
     ncontrol = models.CharField(max_length=150, verbose_name='Número de Control')
     fechafactura = models.DateField(verbose_name='Fecha de Factura')
     fecharecepcion = models.DateField(verbose_name='Fecha de Recepción')
+    fechapago = models.DateField(verbose_name='Fecha de Pago', null=True,  blank=True)
     concepto = models.CharField(max_length=150 , verbose_name='Concepto')
     big = models.DecimalField(verbose_name='BIG', max_digits=20, decimal_places=5, default=0)
     exento = models.DecimalField(verbose_name='Exento', max_digits=20, decimal_places=5, default=0)
@@ -91,6 +98,7 @@ class factura(models.Model):
     estatus3 = models.BooleanField(default=False)
     tiposervicio = models.ForeignKey(Islr, verbose_name="Tipo de servicio", on_delete=models.PROTECT)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT, null=True, default= None)
+    tipo = models.CharField(max_length=3, choices=choise_tipo, default='ser', verbose_name="Tipo de Factura")
 
     def antiguedad(self):
         return (datetime.now().date() - self.fecharecepcion)

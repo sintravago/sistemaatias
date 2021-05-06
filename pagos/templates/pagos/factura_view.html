@@ -62,7 +62,11 @@
                             <tr>
                                 <td><label>Fecha de la Factura</label> <p>{{ object.fechafactura|date:"d/m/Y" }} </p></td>
                                 <td><label>Fecha de Recepción</label> <p>{{ object.fecharecepcion|date:"d/m/Y" }}</p></td>
+                                <td><label>Tipo</label> <p>{{ object.get_tipo_display }}</p></td>                                
+                            </tr>
+                            <tr>
                                 <td><label>Archivo</label> <p>{% if object.archivo %}<a class="btn btn-primary btn-sm" href="{{ object.archivo.url }}" target="_blank"><i class="nav-icon fas fa-eye"></i>&nbsp;&nbsp;Ver</a>{% endif %}</p></td>
+                                <td><label>Tipo de Servicio</label> <p>{{ object.tiposervicio.codigo }}: {{ object.tiposervicio.actividad }}</p></td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,7 +115,7 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <th>Total Factura</th> 
+                                <th>Total Factura (Equivalente)</th> 
                                 <th style="text-align: right;">{{ object.total|floatformat:2 }} </th>
                                 <th style="text-align: right;">{{ object.totalusd|floatformat:2 }}</th>
                             </tr>
@@ -126,7 +130,7 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <th>A pagar en</th> 
+                                <th>Total a Pagar en</th> 
                                 <th style="text-align: right;">{{ object.pagoenbs|floatformat:2 }} </th>
                                 <th style="text-align: right;">{{ object.divisa|floatformat:2 }}</th>
                             </tr>
@@ -169,8 +173,14 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <a href="{% url 'pagos:facturas' %}" class="btn btn-outline-info " />Facturas</a>
-        <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
+        {% comment %} <a href="{% url 'pagos:facturas' %}" class="btn btn-outline-info " />Facturas</a> {% endcomment %}
+        <div class="btn-group float-right">
+            <a target="_blank" href="{% url 'pagos:factura_pdf' object.id %}" class="btn btn-outline-success " />PDF</a>
+            {% if object.estatus3 == False %}
+                <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success" />Editar</a>
+            {% endif %}
+            
+        </div>
       </div>
     </div>
 </section>

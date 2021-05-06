@@ -258,6 +258,12 @@
                   <p>Procesadas</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{% url 'pagos:facturaspp' %}" class="nav-link {% if 'facturaspp/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pagadas</p>
+                </a>
+              </li>
               {% for grupo in request.user.groups.all %}
                 {% if grupo.name == "nivel1" or grupo.name == "nivel2" %}
                   <li class="nav-item">
@@ -275,7 +281,7 @@
             <a href="#" class="nav-link {% if 'empresa'   in request.path %} active {% endif %}">
               <i class="nav-icon fas fa-briefcase"></i>
               <p>
-                Empresas
+                Proveedores
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>

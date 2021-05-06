@@ -1,0 +1,148 @@
+{% load l10n %}
+{% load static %}
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <style type="text/css">
+            body {
+                font-family: "Helvetica", "sans-serif";
+                color: #333333;
+            }
+            .sello{
+                border: 2.5px solid #3C3A3A;
+                padding-top: 5px;
+                font-family: Georgia;
+                font-size: 14px;
+                color: #3C3A3A;
+            }
+            .tsello{
+                font-size: 19px;
+            }
+            .bordes{
+                border: 0.2px solid rgba(34,36,38,.15);
+                padding-top: 3px;
+                padding-left: 1px;
+            }
+            .bordes thead th{
+                background-color: gainsboro;
+                text-align: left;
+            }
+            .bordes thead td{
+                text-align: center;
+            }
+            .centrar tbody td{
+                text-align: center;
+            }
+            .bordes tfoot th{
+                background-color: gainsboro;
+                text-align: right;
+                padding-right:2px;
+            }
+            .firmas{
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <img width="250"  src="{% static 'core/images/logo3.png' %}"  />
+        <table class="bordes">
+            <thead>
+                <tr>
+                    <th colspan='3'>DATOS DEL PROVEEDOR</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>RIF:</b> {{ factura.empresa.rift}}-{{ factura.empresa.rif|unlocalize}}</td>
+                    <td><b>Razon Social:</b> {{ factura.empresa.razon}}</td>
+                    <td><b>Clasificación:</b> {{ factura.empresa.clasificacion}}</td>
+                </tr>
+                <tr>
+                    <td><b>Tlf:</b> {{ factura.empresa.tlf}}</td>
+                    <td colspan='2'><b>Dirección:</b> {{ factura.empresa.dreccion}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>
+                    <th colspan='3'>DATOS DE LA FACTURA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Número de Factura:</b> {{ factura.nfactura }}</td>
+                    <td><b>Número de Control:</b> {{ factura.ncontrol }}</td>
+                    <td><b>Departamento:</b> {{ factura.departamento }}</td>
+                </tr>
+                <tr>
+                    <td><b>Fecha de la Factura:</b> {{ factura.fechafactura|date:"d/m/Y" }}</td>
+                    <td><b>Fecha de Recepción:</b> {{ factura.fecharecepcion|date:"d/m/Y" }}</td>
+                    <td><b>Fecha de Pago:</b> {{ factura.fechapago|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td ><b>Concepto:</b> {{ factura.concepto }}</td>
+                    <td colspan='2'><b>Tipo de Servicio:</b> {{ factura.tiposervicio.codigo }}: {{ factura.tiposervicio.actividad }}</td>
+                </tr>
+                <tr>
+                    <td><b>Tipo:</b> {{ factura.get_tipo_display }}</td>
+                    <td><b>Tipo de Cambio (Factura):</b> {{ factura.cambiofactura|floatformat:2 }}</td>
+                    <td><b>Tipo de Cambio (Fecha de Pago):</b> {{ factura.cambiopago|floatformat:2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <table class="bordes">
+            <thead>
+                <tr>
+                    <th colspan='3'>DETALLE DE LA FACTURA</th>
+                </tr>
+                <tr>
+                    <th width='60%' style="text-align:center;">Concepto</th>
+                    <th width='20%' style="text-align:center;">BS</th>
+                    <th width='20%' style="text-align:center;">USD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding-left:2px;">BIG </td>
+                    <td style="text-align:right;padding-right:2px;">{{ factura.big|floatformat:2 }} </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:2px;"> Exento </td>
+                    <td style="text-align:right;padding-right:2px;">{{ factura.exento|floatformat:2 }} </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:2px;"> IVA ({{ factura.iva|floatformat:2 }}%) </td>
+                    <td style="text-align:right;padding-right:2px;">{{ factura.caliva|floatformat:2 }} </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:2px;"> Total Factura (Equivalente)</td>
+                    <td style="text-align:right;padding-right:2px;">{{ factura.total|floatformat:2 }} </td>
+                    <td style="text-align:right;padding-right:2px;">{{ factura.totalusd|floatformat:2 }} </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:2px;">Retención IVA ({{ factura.retiva|floatformat:2 }}%)</td> 
+                    <td style="text-align:right;padding-right:2px;">{{ factura.calretiva|floatformat:2 }} </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:2px;">Retención ISLR ({{ factura.islr|floatformat:2 }}%)</td> 
+                    <td style="text-align:right;padding-right:2px;">{{ factura.calislr|floatformat:2 }} </td>
+                    <td> </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th style="text-align:center;padding-left:2px;">Total a Pagar en </th> 
+                    <th style="text-align:right;padding-right:2px;">{{ factura.pagoenbs|floatformat:2 }} </th>
+                    <th style="text-align:right;padding-right:2px;">{{ factura.divisa|floatformat:2 }} </th>
+                </tr>
+            </tfoot>
+        </table>
+    </body>
+</html>
