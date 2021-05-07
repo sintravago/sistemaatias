@@ -155,15 +155,19 @@
                                         <td> {{ factura.nfactura }} </td>
                                         <td> {{ factura.ncontrol }} </td>
                                         <td> {{ factura.total|floatformat:2 }} </td>
-                                        {% for grupo in request.user.groups.all %}
-                                            {% if grupo.name == "nivel2" %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
-                                            {% elif grupo.name == "nivel1" %}
-                                                <td> {% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
-                                            {% else %}
-                                                <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-lock">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if factura.anticipo == True and factura.anticipop == True or factura.anticipo == False and factura.anticipop == False %}
+                                            {% for grupo in request.user.groups.all %}
+                                                {% if grupo.name == "nivel2" %}
+                                                    <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                                {% elif grupo.name == "nivel1" %}
+                                                    <td> {% if factura.estatus == False %}<i class="fas fa-circle">{% else %}<i class="fas fa-check-circle">{% endif %}</i></td>
+                                                {% else %}
+                                                    <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:facturas_update2" factura.id|unlocalize %}?suc=0{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}{% if request.GET.page %}&page={{request.GET.page}}{% endif %}">{% if factura.estatus2 == False %}<i class="fas fa-lock">{% else %}<i class="fas fa-check-circle">{% endif %}</i></a> </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <td>Anticipo</td>
+                                        {%endif %}
                                         <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
                                     </tr>
                                 {% empty %}

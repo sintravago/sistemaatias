@@ -7,8 +7,8 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from .forms import FacturaForm, EmpresaForm, ivaUpdateForm, FacturaEditForm
-from .models import factura, Empresa, iva, Islr
+from .forms import FacturaForm, EmpresaForm, ivaUpdateForm, FacturaEditForm, AnticipoForm
+from .models import factura, Empresa, iva, Islr, anticipo
 from registration.models import departamento
 from django.db.models import Q, Sum, F
 from django.contrib.auth.models import User, Group
@@ -554,3 +554,66 @@ def exportarfacturas(request):
             ]) 
     sheet = excel.pe.Sheet(export)
     return excel.make_response(sheet, "xlsx", file_name="reporte_excel")
+
+@method_decorator(login_required, name='dispatch')
+class AnticipoCreateView(CreateView):
+    form_class = AnticipoForm
+    template_name = 'pagos/anticipo_add.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = factura.objects.get(pk=self.kwargs['factura'])
+        context['cambio'] = str(round(context['object'].cambiopago,2)).replace(',','.')
+        return context
+
+    def get_success_url(self):
+        fact = factura.objects.get(pk=self.kwargs['factura'])
+        fact.anticipo = True
+        fact.save()
+        return reverse_lazy("pagos:factura_view", kwargs={'pk': self.object.factura.id})
+
+@method_decorator(login_required, name='dispatch')
+class AnticipoListView(ListView):
+    model = anticipo
+    template_name = 'pagos/anticipos.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.filter(estatus=False)
+        return object_list
+
+@method_decorator(login_required, name='dispatch')
+class AnticipopListView(ListView):
+    model = anticipo
+    template_name = 'pagos/anticipos.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        object_list = self.model.objects.filter(estatus=True)
+        return object_list
+
+def anticipo_update(request,pk):
+    actualizar = anticipo.objects.get(pk = pk)
+    if actualizar.estatus == False:
+        today    = datetime.now()
+        strToday = today.strftime("%Y-%m-%d")
+        actualizar.estatus = True
+        actualizar.fechapago = strToday
+        actualizar.save()
+        fact = factura.objects.get(pk=actualizar.factura.pk)
+        fact.anticipop = True
+        fact.save()
+
+        
+    add = "?suc=1"
+    if "search" in request.GET:
+        add += "&search=" + request.GET["search"]
+    if "ord" in request.GET:
+        add += "&ord=" + request.GET["ord"]
+    if "page" in request.GET:
+        add += "&page=" + request.GET["page"]
+    if "departamento" in request.GET:
+        add += "&departamento=" + request.GET["departamento"]
+    if "tipo" in request.GET:
+        add += "&tipo=" + request.GET["tipo"]
+    return redirect(reverse("pagos:anticipos")+add)

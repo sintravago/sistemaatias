@@ -111,9 +111,9 @@
               </div>
             </div>
             <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
-            <input type="hidden" name="retiva" id="id_retiva" value="{{ retiva }}">
-            <input type="hidden" name="islr" id="id_islr" value={{ islr }}>
-            <input type="hidden" name="sustraendo" id="id_sustraendo" value={{ sustraendo }}>
+            <input type="hidden" name="retiva" id="id_retiva" value="{{ retiva|unlocalize }}">
+            <input type="hidden" name="islr" id="id_islr" value={{ islr|unlocalize }}>
+            <input type="hidden" name="sustraendo" id="id_sustraendo" value={{ sustraendo|unlocalize }}>
             
           </div>
           <!-- /.card-body -->
@@ -267,7 +267,7 @@
     }
 
     function calculariva() {
-      iva = ({{ iva }} / 100) * parseFloat(document.getElementById("id_big").value)
+      iva = ({{ iva|unlocalize }} / 100) * parseFloat(document.getElementById("id_big").value)
       totalbs = parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value) + iva
       calretiva = iva * parseFloat(document.getElementById("id_retiva").value) / 100
       calislr = ((parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value)) * parseFloat(document.getElementById("id_islr").value) / 100) - parseFloat(document.getElementById("id_sustraendo").value)

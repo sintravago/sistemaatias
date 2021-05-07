@@ -277,6 +277,29 @@
               
             </ul>
           </li>
+          <li class="nav-item has-treeview {% if 'anticipos' in request.path %} menu-open {% endif %}">
+            <a href="#" class="nav-link {% if 'anticipos'   in request.path %} active {% endif %}">
+              <i class="nav-icon fas fa-file-invoice"></i>
+              <p>
+                Anticipos
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'pagos:anticipos' %}" class="nav-link {% if 'anticipos/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pendientes</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'pagos:anticiposp' %}" class="nav-link {% if 'anticiposp/' in request.path %} active {% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Pagados</p>
+                </a>
+              </li>              
+            </ul>
+          </li>
           <li class="nav-item has-treeview {% if 'empresa' in request.path %} menu-open {% endif %}">
             <a href="#" class="nav-link {% if 'empresa'   in request.path %} active {% endif %}">
               <i class="nav-icon fas fa-briefcase"></i>

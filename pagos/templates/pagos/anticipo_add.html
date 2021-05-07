@@ -1,0 +1,253 @@
+{% extends "pagos/base.html" %}
+{% block title %} Anticipo {% endblock %}
+{% load static %}
+{% load l10n %}
+{% load i18n %}
+{% block titulo %}  {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+
+    <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'core/plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Cargar Anticipo</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Anticipo</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>{{ form.montousd.label }}</label> 
+                            {{ form.montousd }}
+                        </div>
+                        <table width = "100%">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <label>{{ form.montobs.label }}</label> 
+                                            {{ form.montobs }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <label>{{ form.cambio.label }}</label> 
+                                            <input type="number" name="cambio" value="{{ cambio }}" class="form-control" placeholder="pago en USD" step=".00001" min="0" onkeyup="calculartotal()" required="" id="id_cambio">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
+                        <input type="hidden" name="factura" id="id_retiva" value="{{ object.pk|unlocalize }}">
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Ajuste</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table style="width:100%" class="table table-sm table-hover ">
+                            <thead>
+                               <tr>
+                                    <th> </th>
+                                    <th style="text-align: right;">BS</th>
+                                    <th style="text-align: right;">USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Total a Pagar en</th> 
+                                    <th style="text-align: right;"><label id="id_pagobs">{{ object.pagoenbs|floatformat:2 }}</label></th>
+                                    <th style="text-align: right;"><label id="id_pagousd">{{ object.divisa|floatformat:2 }}</label></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Montos de la Factura </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table style="width:100%" class="table table-sm table-hover ">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th style="text-align: right;">BS</th>
+                                    <th style="text-align: right;">USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BIG</td>
+                                    <td style="text-align: right;">{{ object.big|floatformat:2 }} </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Exento </td>
+                                    <td style="text-align: right;">{{ object.exento|floatformat:2 }}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>IVA</td>
+                                    <td style="text-align: right;">{{ object.caliva|floatformat:2 }}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Total Factura (Equivalente)</th> 
+                                    <th style="text-align: right;">{{ object.total|floatformat:2 }} </th>
+                                    <th style="text-align: right;">{{ object.totalusd|floatformat:2 }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Retención IVA</td> 
+                                    <td style="text-align: right;">{{ object.calretiva|floatformat:2 }} </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Retención ISLR</td> 
+                                    <td style="text-align: right;">{{ object.calislr|floatformat:2 }} </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Total a Pagar en</th> 
+                                    <th style="text-align: right;">{{ object.pagoenbs|floatformat:2 }} </th>
+                                    <th style="text-align: right;">{{ object.divisa|floatformat:2 }}</th>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        {% comment %} {% for grupo in request.user.groups.all %}
+                            {% if grupo.name == "nivel1" %}
+                                
+                            {% elif grupo.name == "nivel2" %}
+                                <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
+                            {% elif grupo.name == "nivel3" and object.estatus != "P" %}
+                                <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
+                            {% endif %}
+                        {% endfor %} {% endcomment %}
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        <table style="width:100%" class="table table-sm table-hover ">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Cambio</td>
+                                    <th style="text-align: right;">BS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Factura</td>
+                                    <td style="text-align: right;">{{ object.cambiofactura|floatformat:2 }} </td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha de Pago</td>
+                                    <td style="text-align: right;">{{ object.cambiopago|floatformat:2 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <input type="submit" class="btn btn-outline-success float-right" value="Aceptar"/>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'core/plugins/select2/js/select2.full.min.js' %}"></script>
+
+
+
+<script>
+    $(function () {
+        $("#example1").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+        });
+
+        $("#example2").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+        });
+        $('.select2bs4').select2({
+          theme: 'bootstrap4'
+        })        
+    });
+
+    function formatNumber(num){
+        num = parseFloat(num).toFixed(2);
+        num = num.toString().replace('.',',');
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    }
+
+    function calculartotal(){
+        pagousd = parseFloat({{ object.divisa|unlocalize }}) - parseFloat(document.getElementById("id_montousd").value)
+        document.getElementById("id_pagousd").innerHTML = formatNumber(pagousd)
+        pagobs = parseFloat({{ object.totalbs|unlocalize }}) + (parseFloat({{ object.pagousd|unlocalize }}) - parseFloat({{ object.divisa|unlocalize }}) ) * parseFloat(document.getElementById("id_cambio").value) - parseFloat(document.getElementById("id_montobs").value)
+        document.getElementById("id_pagobs").innerHTML = formatNumber(pagobs)
+    }
+</script>
+{% endblock %}

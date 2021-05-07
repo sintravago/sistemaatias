@@ -96,6 +96,8 @@ class factura(models.Model):
     estatus = models.BooleanField(default=False)
     estatus2 = models.BooleanField(default=False)
     estatus3 = models.BooleanField(default=False)
+    anticipo = models.BooleanField(default=False)
+    anticipop = models.BooleanField(default=False)
     tiposervicio = models.ForeignKey(Islr, verbose_name="Tipo de servicio", on_delete=models.PROTECT)
     departamento = models.ForeignKey(departamento, verbose_name="Departamento", on_delete=models.PROTECT, null=True, default= None)
     tipo = models.CharField(max_length=3, choices=choise_tipo, default='ser', verbose_name="Tipo de Factura")
@@ -132,7 +134,7 @@ class factura(models.Model):
 
     def pagoenbs(self):
         if self.cambiopago > 0:
-            return ((self.pagousd() - self.divisa) * self.cambiopago) + (self.caliva() - self.calretiva())
+            return ((self.pagousd() - self.divisa) * self.cambiopago) + self.totalbs()
         else:
             return self.total() - self.calretiva() - self.calislr()
 
@@ -142,3 +144,19 @@ class iva(models.Model):
     def __str__(self):
         return self.porcentaje
 
+class anticipo(models.Model):
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
+    updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
+    user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
+    factura = models.ForeignKey(factura, verbose_name="Factura", on_delete=models.PROTECT, related_name="get_anticipo")
+    fechapago = models.DateField(verbose_name='Fecha de Pago', null=True,  blank=True)
+    montobs = models.DecimalField(verbose_name='BS', max_digits=20, decimal_places=5, default=0)
+    montousd = models.DecimalField(verbose_name='USD', max_digits=20, decimal_places=5, default=0)
+    cambio = models.DecimalField(verbose_name='Tipo de cambio', max_digits=20, decimal_places=5, default = 0)
+    estatus = models.BooleanField(default=False)
+
+    def pagousd(self):
+        return self.factura.divisa - self.montousd
+
+    def pagobs(self):
+        return self.factura.totalbs() + (self.factura.pagousd() - self.factura.divisa) * self.cambio - self.montobs

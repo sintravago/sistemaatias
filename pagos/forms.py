@@ -1,5 +1,5 @@
 from django import forms
-from .models import factura, Empresa, iva
+from .models import factura, Empresa, iva, anticipo
 
 class EmpresaForm(forms.ModelForm):
     class Meta:
@@ -72,11 +72,20 @@ class FacturaEditForm(forms.ModelForm):
             'tipo': forms.Select(attrs={'class':'form-control', 'style':'width: 100%;'}),
         }
 
-
 class ivaUpdateForm(forms.ModelForm):
     class Meta:
         model = iva
         fields = ['porcentaje',]
         widgets = {
             'porcentaje': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'IVA', 'step':'.01', 'min':'0'}),
+        }
+
+class AnticipoForm(forms.ModelForm):
+    class Meta:
+        model = anticipo
+        fields = ['factura','montobs','montousd', 'cambio','user']
+        widgets = {
+            'montobs': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en BS', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
+            'montousd': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
+            'cambio': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
         }

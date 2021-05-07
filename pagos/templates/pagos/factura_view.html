@@ -169,6 +169,54 @@
                     </table>
                 </div>
             </div>
+            {% if object.get_anticipo.all.count > 0%}
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Anticipo </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table style="width:100%" class="table table-sm table-hover ">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: right;">Tipo de Cambio</th>
+                                    <th style="text-align: right;">BS</th>
+                                    <th style="text-align: right;">USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for anticipo in object.get_anticipo.all %}
+                                    <tr>
+                                        <td style="text-align: right;">{{ anticipo.cambio|floatformat:2 }}</td> 
+                                        <td style="text-align: right;">{{ anticipo.montobs|floatformat:2 }}</td>
+                                        <td style="text-align: right;">{{ anticipo.montousd|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <table style="width:100%" class="table table-sm table-hover ">
+                            <thead>
+                                <tr>
+                                    <th> </th>
+                                    <th style="text-align: right;">BS</th>
+                                    <th style="text-align: right;">USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for anticipo in object.get_anticipo.all %}
+                                    <tr>
+                                        <th style="text-align: right;">Total a Pagar en</th> 
+                                        <th style="text-align: right;"><label id="id_pagobs">{{ anticipo.pagobs|floatformat:2 }}</label></th>
+                                        <th style="text-align: right;"><label id="id_pagousd">{{ anticipo.pagousd|floatformat:2 }}</label></th>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="row">
@@ -176,7 +224,10 @@
         {% comment %} <a href="{% url 'pagos:facturas' %}" class="btn btn-outline-info " />Facturas</a> {% endcomment %}
         <div class="btn-group float-right">
             <a target="_blank" href="{% url 'pagos:factura_pdf' object.id %}" class="btn btn-outline-success " />PDF</a>
-            {% if object.estatus3 == False %}
+            {% if object.estatus3 == False and object.estatus2 == False %}
+                {% if object.anticipo == False %}
+                    <a href="{% url 'pagos:anticipo_add' object.id %}" class="btn btn-outline-success" />Anticipo</a>
+                {% endif %}
                 <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success" />Editar</a>
             {% endif %}
             

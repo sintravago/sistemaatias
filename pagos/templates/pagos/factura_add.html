@@ -268,7 +268,7 @@
     }
 
     function calculariva() {
-      iva = ({{ iva }} / 100) * parseFloat(document.getElementById("id_big").value)
+      iva = ({{ iva|unlocalize }} / 100) * parseFloat(document.getElementById("id_big").value)
       totalbs = parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value) + iva
       calretiva = iva * parseFloat(document.getElementById("id_retiva").value) / 100
       calislr = ((parseFloat(document.getElementById("id_big").value) + parseFloat(document.getElementById("id_exento").value)) * parseFloat(document.getElementById("id_islr").value) / 100) - parseFloat(document.getElementById("id_sustraendo").value)

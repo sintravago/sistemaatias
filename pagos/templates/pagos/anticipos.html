@@ -1,0 +1,164 @@
+{% extends "pagos/base.html" %}
+{% block title %} Anticipos {% endblock %}
+{% load static %}
+{% load l10n %}
+{% block titulo %}  {% endblock %}
+{% block head %} 
+    <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/daterangepicker/daterangepicker.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+{% endblock %}
+{% block breadcums %} 
+    
+{% endblock %}
+
+{% block contenido %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Anticipos Pendientes</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+    <form method="GET">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Anticipos Clínica Atías</h3>
+                        <div class="card-tools">
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table id="example1" class="table table-hover projects">
+                            <thead>
+                                <tr>
+                                    <th>RIF</th>                                
+                                    <th>Razón Soc.</th>                             
+                                    <th>N° Factura</th>
+                                    <th>N° Control</th>
+                                    <th>Monto Bs</th>
+                                    <th>Monto USD</th>
+                                    {% if 'anticipos/' in request.path %} <th></th> {% endif %}
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for anticipo in object_list %}
+                                    <tr>
+                                        <td> {{ anticipo.factura.empresa.rift }}-{{ anticipo.factura.empresa.rif|unlocalize }} </td>
+                                        <td> {{ anticipo.factura.empresa.razon }} </td>
+                                        <td> {{ anticipo.factura.nfactura }} </td>
+                                        <td> {{ anticipo.factura.ncontrol }} </td>
+                                        <td> {{ anticipo.montobs }} </td>
+                                        <td> {{ anticipo.montousd }} </td>
+                                        {% if 'anticipos/' in request.path %} <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:anticipos_update" anticipo.id|unlocalize %}"><i class="fas fa-handshake"></i> Pagar</a> </td>{% endif %}
+                                        <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" anticipo.factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan = 6>No hay Anticipos aún.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        <ul class="pagination pagination-sm m-0 float-right">
+                            {% if page_obj.has_previous %}
+                            <li class="paginate_button page-item first">
+                                <a class="page-link" href="?page=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">&laquo; Primera</a>
+                            </li>
+                            <li class="paginate_button page-item previous">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Anterior</a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="paginate_button page-item active">
+                                <a class="page-link" >Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</a>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="paginate_button page-item next">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="paginate_button page-item last">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}{% if request.GET.ord %}&ord={{request.GET.ord}}{% endif %}">Ultima &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        {% comment %} <a class="btn btn-outline-success float-left" href="{% url 'presupuestos:agremiado-add'%}"><i class="fas fa-plus-square mr-1"></i> Registrar Agremiado </a> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} <div class="row">
+            <div class="col-12">
+                <a target="_blank" href="{% url "pagos:exportar"%}?export=1{% if request.GET.reservation %}&reservation={{request.GET.reservation}}{% endif %}{% if request.GET.tipo %}&tipo={{request.GET.tipo}}{% endif %}{% if request.GET.departamento %}&departamento={{request.GET.departamento}}{% endif %}{% if request.GET.estatus %}&estatus={{request.GET.estatus}}{% endif %}{% if request.GET.search %}&search={{request.GET.search}}{% endif %}" class="btn btn-outline-secondary ">Exportar</a>
+            </div>
+        </div> {% endcomment %}
+    </form>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'core/plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'core/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script src="{% static 'core/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'core/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+
+<script>
+$(function () {
+    $('.select2bs4').select2({
+        theme: 'bootstrap4'
+    })
+
+    $('#id_check').on('click',function(){
+        if (this.checked){
+            $("#reservation").attr('disabled', false);
+        }else{
+            $("#reservation").attr('disabled', true);
+        }
+        
+    })
+})
+    $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      //Date range picker
+      $('#reservation').daterangepicker({
+        
+        locale: {
+          format: 'DD/MM/YYYY',
+          monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+          monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
+          dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+          dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+        }
+      })
+      //Date range picker with time picker
+      $('#reservationtime').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 30,
+            locale: {
+            format: 'DD/MM/YYYY hh:mm A'
+            }
+        })
+
+    
+
+</script>
+{% endblock %}
