@@ -6,7 +6,7 @@ class facturaAdmin(admin.ModelAdmin):
     list_display = ('empresa','big','exento')
 
 class IslrAdmin(admin.ModelAdmin):
-    list_display = ('codigo','actividad','porcentaje','sustraendo')
+    list_display = ('codigo','actividad','Tipo','porcentaje','sustraendo')
 
 admin.site.register(factura, facturaAdmin)
 admin.site.register(Islr, IslrAdmin)
