@@ -49,6 +49,7 @@ class Empresa(models.Model):
         ('G', 'G'),
     ]
     choise_iva = [
+        (0,0),
         (75, 75),
         (100, 100),
     ]
