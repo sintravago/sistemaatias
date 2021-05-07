@@ -7,7 +7,7 @@ class EmpresaForm(forms.ModelForm):
         fields = ['user','rif','rift','razon','clasificacion','direccion','tlf', 'retiva']
         widgets = {
             'rift': forms.Select(attrs={'class':'custom-select', 'style':'width: 100%;'}),
-            'rif': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'RIF', 'min':'1'}),
+            'rif': forms.TextInput(attrs={'class':'form-control', 'placeholder':'RIF'}),
             'razon': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Razón'}),
             'clasificacion': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
             'retiva': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),

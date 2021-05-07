@@ -55,7 +55,7 @@ class Empresa(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
-    rif = models.IntegerField(verbose_name='RIF')
+    rif = models.CharField(verbose_name='RIF', max_length=150)
     rift = models.CharField(max_length=1, choices=choise_rift, default='J')
     razon = models.CharField(max_length=150 , verbose_name='Razón Social')
     clasificacion = models.CharField(max_length=5, choices=choise_clasificacion, default='PNR')
