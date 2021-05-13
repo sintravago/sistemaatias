@@ -138,6 +138,11 @@
             </tbody>
             <tfoot>
                 <tr>
+                    <th style="text-align:center;padding-left:2px;">Total </th> 
+                    <th style="text-align:right;padding-right:2px;">{{ factura.totalbs|floatformat:2 }} </th>
+                    <th style="text-align:right;padding-right:2px;">{{ factura.pagousd|floatformat:2 }} </th>
+                </tr>
+                <tr>
                     <th style="text-align:center;padding-left:2px;">Total a Pagar en </th> 
                     <th style="text-align:right;padding-right:2px;">{{ factura.pagoenbs|floatformat:2 }} </th>
                     <th style="text-align:right;padding-right:2px;">{{ factura.divisa|floatformat:2 }} </th>
