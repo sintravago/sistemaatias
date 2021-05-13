@@ -54,7 +54,7 @@
 <section class="content">
     <form method="post" enctype="multipart/form-data">{% csrf_token %}
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Anticipo</h3>
@@ -62,8 +62,8 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <div class="form-group">
-                            <label>{{ form.montousd.label }}</label> 
-                            {{ form.montousd }}
+                            <label>{{ form.empresa.label }}</label> 
+                            {{ form.empresa }}
                         </div>
                         <table width = "100%">
                             <tbody>
@@ -76,133 +76,25 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <label>{{ form.cambio.label }}</label> 
-                                            <input type="number" name="cambio" value="{{ cambio }}" class="form-control" placeholder="pago en USD" step=".00001" min="0" onkeyup="calculartotal()" required="" id="id_cambio">
+                                            <label>{{ form.montousd.label }}</label> 
+                                            {{ form.montousd }}
                                         </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <input type="hidden" name="user" id="id_user" value="{{ request.user.id|unlocalize }}">
-                        <input type="hidden" name="factura" id="id_retiva" value="{{ object.pk|unlocalize }}">
                     </div>
                     <!-- /.card-body -->
                 </div>
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title">Ajuste</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table style="width:100%" class="table table-sm table-hover ">
-                            <thead>
-                               <tr>
-                                    <th> </th>
-                                    <th style="text-align: right;">BS</th>
-                                    <th style="text-align: right;">USD</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>Total a Pagar en</th> 
-                                    <th style="text-align: right;"><label id="id_pagobs">{{ object.pagoenbs|floatformat:2 }}</label></th>
-                                    <th style="text-align: right;"><label id="id_pagousd">{{ object.divisa|floatformat:2 }}</label></th>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
             </div>
             <div class="col-md-5">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title">Montos de la Factura </h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table style="width:100%" class="table table-sm table-hover ">
-                            <thead>
-                                <tr>
-                                    <th>Concepto</th>
-                                    <th style="text-align: right;">BS</th>
-                                    <th style="text-align: right;">USD</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>BIG</td>
-                                    <td style="text-align: right;">{{ object.big|floatformat:2 }} </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Exento </td>
-                                    <td style="text-align: right;">{{ object.exento|floatformat:2 }}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>IVA</td>
-                                    <td style="text-align: right;">{{ object.caliva|floatformat:2 }}</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th>Total Factura (Equivalente)</th> 
-                                    <th style="text-align: right;">{{ object.total|floatformat:2 }} </th>
-                                    <th style="text-align: right;">{{ object.totalusd|floatformat:2 }}</th>
-                                </tr>
-                                <tr>
-                                    <td>Retención IVA</td> 
-                                    <td style="text-align: right;">{{ object.calretiva|floatformat:2 }} </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Retención ISLR</td> 
-                                    <td style="text-align: right;">{{ object.calislr|floatformat:2 }} </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th>Total a Pagar en</th> 
-                                    <th style="text-align: right;">{{ object.pagoenbs|floatformat:2 }} </th>
-                                    <th style="text-align: right;">{{ object.divisa|floatformat:2 }}</th>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                        {% comment %} {% for grupo in request.user.groups.all %}
-                            {% if grupo.name == "nivel1" %}
-                                
-                            {% elif grupo.name == "nivel2" %}
-                                <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
-                            {% elif grupo.name == "nivel3" and object.estatus != "P" %}
-                                <a href="{% url 'pagos:factura_edite' object.id %}" class="btn btn-outline-success float-right" />Editar</a>
-                            {% endif %}
-                        {% endfor %} {% endcomment %}
-                    </div>
-                    <!-- /.card-body -->
-                    <div class="card-footer">
-                        <table style="width:100%" class="table table-sm table-hover ">
-                            <thead>
-                                <tr>
-                                    <th>Tipo de Cambio</td>
-                                    <th style="text-align: right;">BS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Factura</td>
-                                    <td style="text-align: right;">{{ object.cambiofactura|floatformat:2 }} </td>
-                                </tr>
-                                <tr>
-                                    <td>Fecha de Pago</td>
-                                    <td style="text-align: right;">{{ object.cambiopago|floatformat:2 }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
+            <div class="col-6">
                 <input type="submit" class="btn btn-outline-success float-right" value="Aceptar"/>
             </div>
         </div>

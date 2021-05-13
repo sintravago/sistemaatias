@@ -343,6 +343,11 @@ class FacturaDetailView(DetailView):
     template_name = 'pagos/factura_view.html'
 
 @method_decorator(login_required, name='dispatch')
+class EmpresaDetailView(DetailView):
+    model = Empresa
+    template_name = 'pagos/empresa_view.html'
+
+@method_decorator(login_required, name='dispatch')
 class FacturaUpdate(UpdateView):
     form_class = FacturaEditForm
     template_name = 'pagos/factura_edit.html'
@@ -560,17 +565,17 @@ class AnticipoCreateView(CreateView):
     form_class = AnticipoForm
     template_name = 'pagos/anticipo_add.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['object'] = factura.objects.get(pk=self.kwargs['factura'])
-        context['cambio'] = str(round(context['object'].cambiopago,2)).replace(',','.')
-        return context
+    def get_success_url(self):
+        return reverse_lazy("pagos:anticipos")
+
+@method_decorator(login_required, name='dispatch')
+class AnticipoEdit(UpdateView):
+    form_class = AnticipoForm
+    model = anticipo
+    template_name = 'pagos/anticipo_add.html'
 
     def get_success_url(self):
-        fact = factura.objects.get(pk=self.kwargs['factura'])
-        fact.anticipo = True
-        fact.save()
-        return reverse_lazy("pagos:factura_view", kwargs={'pk': self.object.factura.id})
+        return reverse_lazy("pagos:anticipos")
 
 @method_decorator(login_required, name='dispatch')
 class AnticipoListView(ListView):
@@ -600,9 +605,6 @@ def anticipo_update(request,pk):
         actualizar.estatus = True
         actualizar.fechapago = strToday
         actualizar.save()
-        fact = factura.objects.get(pk=actualizar.factura.pk)
-        fact.anticipop = True
-        fact.save()
 
         
     add = "?suc=1"

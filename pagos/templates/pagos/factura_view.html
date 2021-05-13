@@ -225,9 +225,6 @@
         <div class="btn-group float-right">
             <a target="_blank" href="{% url 'pagos:factura_pdf' object.id %}" class="btn btn-outline-success " />PDF</a>
             {% if object.estatus3 == False and object.estatus2 == False %}
-                {% if object.anticipo == False %}
-                    <a href="{% url 'pagos:anticipo_add' object.id %}" class="btn btn-outline-success" />Anticipo</a>
-                {% endif %}
                 <a href="{% url 'pagos:factura_edit' object.id %}" class="btn btn-outline-success" />Editar</a>
             {% endif %}
             

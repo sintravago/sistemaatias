@@ -41,25 +41,31 @@
                                 <tr>
                                     <th>RIF</th>                                
                                     <th>Razón Soc.</th>                             
-                                    <th>N° Factura</th>
-                                    <th>N° Control</th>
                                     <th>Monto Bs</th>
                                     <th>Monto USD</th>
-                                    {% if 'anticipos/' in request.path %} <th></th> {% endif %}
-                                    <th></th>
+                                    {% if 'anticipos/' in request.path %} 
+                                        <th></th>
+                                    {% else %}
+                                        <th>F. Pago</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for anticipo in object_list %}
                                     <tr>
-                                        <td> {{ anticipo.factura.empresa.rift }}-{{ anticipo.factura.empresa.rif|unlocalize }} </td>
-                                        <td> {{ anticipo.factura.empresa.razon }} </td>
-                                        <td> {{ anticipo.factura.nfactura }} </td>
-                                        <td> {{ anticipo.factura.ncontrol }} </td>
+                                        <td> {{ anticipo.empresa.rift }}-{{ anticipo.empresa.rif|unlocalize }} </td>
+                                        <td> {{ anticipo.empresa.razon }} </td>
                                         <td> {{ anticipo.montobs }} </td>
                                         <td> {{ anticipo.montousd }} </td>
-                                        {% if 'anticipos/' in request.path %} <td> <a class="btn btn-info btn-sm" href="{% url  "pagos:anticipos_update" anticipo.id|unlocalize %}"><i class="fas fa-handshake"></i> Pagar</a> </td>{% endif %}
-                                        <td> <a class="btn btn-primary btn-sm" href="{% url "pagos:factura_view" anticipo.factura.id|unlocalize %}"><i class="nav-icon fas fa-eye"></i> Ver</a></td>
+                                        {% if 'anticiposp/' in request.path %} 
+                                            <td>{{ anticipo.fechapago|date:"d/m/Y" }}</td>
+                                        {% endif %}
+                                        {% if 'anticipos/' in request.path %} 
+                                            <td> 
+                                                <a class="btn btn-primary btn-sm" href="{% url  "pagos:anticipos_edit" anticipo.id|unlocalize %}"><i class="fas fa-edit"></i> Edit</a> 
+                                                <a class="btn btn-info btn-sm" href="{% url  "pagos:anticipos_update" anticipo.id|unlocalize %}"><i class="fas fa-handshake"></i> Pagar</a> 
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% empty %}
                                     <tr>

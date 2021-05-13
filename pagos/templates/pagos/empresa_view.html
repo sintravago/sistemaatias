@@ -1,0 +1,145 @@
+{% extends "pagos/base.html" %}
+{% block title %} Proveedor {% endblock %}
+{% load static %}
+{% load l10n %}
+{% block contenido %}
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h5><i class="icon fas fa-ban"></i> Error!</h5>
+        {{ error|escape }} {{ field.name }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Detalle del Proveedor</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Datos del Proveedor</h3>
+        </div> 
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table style="width:100%" class = "table ">
+            <tbody>
+              <tr>
+                <th>RIF</th>
+                <th>Razón Social</th>
+              </tr>
+              <tr>
+                <td>{{ object.rift }}-{{ object.rif }}</td>
+                <td>{{ object.razon }}</td>
+              </tr>
+              <tr>
+                <th>Clasificación</th>
+                <th>% Retención IVA</th>
+              </tr>
+              <tr>
+                <td>{{ object.clasificacion }}</td>
+                <td>{{ object.retiva }}</td>
+              </tr>
+              <tr>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+              </tr>
+              <tr>
+                <td>{{ object.tlf }}</td>
+                <td>{{ object.direccion }}</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </div>
+    <div class="col-md-6">
+      <div class="card card-secondary">
+        <div class="card-header">
+          <h3 class="card-title">Anticipos</h3>
+        </div> 
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table style="width:100%" class = "table table-sm">
+            <thead>
+              <tr>
+                <th>Monto BS</th>
+                <th>Monto USD</th>
+                <th>F. Pago</th>
+                <th>Estatus</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for anticipo in object.get_anticipo.all %}
+                {% if not anticipo.factura %}
+                  <tr>
+                    <td>{{ anticipo.montobs|floatformat:2 }}</td>
+                    <td>{{ anticipo.montousd|floatformat:2 }}</td>
+                    <td>{% if anticipo.fechapago %}{{ anticipo.fechapago|date:"d/m/Y" }}{% endif %}</td>
+                    <td>{% if anticipo.estatus %}Pagado{% else %}Pendiente{% endif %}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <a href="{% url "pagos:empresa_edit" object.id|unlocalize %}" class="btn btn-outline-success float-right">Editar</a>
+    </div>
+  </div>
+</section>  
+
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'core/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+  <script>
+    $(function () {
+      $('[data-mask]').inputmask()
+      //Date range picker
+      $('.select2').select2();
+      $('#reservationdate').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('#reservationdate2').datetimepicker({
+          format: 'DD/MM/YYYY'
+      });
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      });
+    })      
+  </script>
+
+  <script type="text/javascript">
+  $(document).ready(function () {
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}

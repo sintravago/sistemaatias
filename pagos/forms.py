@@ -83,9 +83,10 @@ class ivaUpdateForm(forms.ModelForm):
 class AnticipoForm(forms.ModelForm):
     class Meta:
         model = anticipo
-        fields = ['factura','montobs','montousd', 'cambio','user']
+        fields = ['empresa','montobs','montousd', 'user']
         widgets = {
-            'montobs': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en BS', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
-            'montousd': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
-            'cambio': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0', 'onkeyup':'calculartotal()'}),
+            'empresa': forms.Select(attrs={'class':'select2bs4', 'style':'width: 100%;'}),
+            'montobs': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Pago en BS', 'step':'.00001', 'min':'0'}),
+            'montousd': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0'}),
+            'cambio': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'pago en USD', 'step':'.00001', 'min':'0'}),
         }

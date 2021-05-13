@@ -149,15 +149,9 @@ class anticipo(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     updated = models.DateTimeField(auto_now=True, verbose_name='Fecha de edición')
     user = models.ForeignKey(User, verbose_name="Usuario", on_delete=models.PROTECT) 
-    factura = models.ForeignKey(factura, verbose_name="Factura", on_delete=models.PROTECT, related_name="get_anticipo")
+    factura = models.ForeignKey(factura, verbose_name="Factura", on_delete=models.PROTECT, related_name="get_anticipo", null=True, blank=True)
+    empresa = models.ForeignKey(Empresa, verbose_name="Proveedor", on_delete=models.PROTECT, related_name="get_anticipo")
     fechapago = models.DateField(verbose_name='Fecha de Pago', null=True,  blank=True)
     montobs = models.DecimalField(verbose_name='BS', max_digits=20, decimal_places=5, default=0)
     montousd = models.DecimalField(verbose_name='USD', max_digits=20, decimal_places=5, default=0)
-    cambio = models.DecimalField(verbose_name='Tipo de cambio', max_digits=20, decimal_places=5, default = 0)
     estatus = models.BooleanField(default=False)
-
-    def pagousd(self):
-        return self.factura.divisa - self.montousd
-
-    def pagobs(self):
-        return self.factura.totalbs() + (self.factura.pagousd() - self.factura.divisa) * self.cambio - self.montobs
