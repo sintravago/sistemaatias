@@ -321,7 +321,9 @@
         let html_data = '<option value="">Selecciona un tipo de servicio</option>';
         data.forEach(function (data) {
             if(data.id){
-              html_data += `<option value="${data.id}">${data.codigo} : ${data.actividad}</option>`
+              porcentaje = parseFloat(data.porcentaje).toFixed(2);
+              sustraendo = parseFloat(data.sustraendo).toFixed(2);
+              html_data += `<option value="${data.id}">(${porcentaje}% - ${sustraendo}) ${data.codigo} : ${data.actividad} </option>`
             }else{
               retiva = data.retiva;
             }

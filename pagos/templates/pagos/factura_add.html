@@ -81,7 +81,7 @@
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>{{ form.tiposervicio.label }}</label> 
-                  <select class="select2bs4" name="tiposervicio" id="id_tiposervicio" style='width: 100%;'>
+                  <select class="custom-select" name="tiposervicio" id="id_tiposervicio" >
                       <option selected disabled>Selecciona una empresa</option>
                   </select>
                 </div>
@@ -322,7 +322,9 @@
         let html_data = '<option value="">Selecciona un tipo de servicio</option>';
         data.forEach(function (data) {
             if(data.id){
-              html_data += `<option value="${data.id}">${data.codigo} : ${data.actividad} (${data.porcentaje}% -  ${data.sustraendo})</option>`
+              porcentaje = parseFloat(data.porcentaje).toFixed(2);
+              sustraendo = parseFloat(data.sustraendo).toFixed(2);
+              html_data += `<option value="${data.id}">(${porcentaje}% - ${sustraendo}) ${data.codigo} : ${data.actividad} </option>`
             }else{
               retiva = data.retiva;
             }
