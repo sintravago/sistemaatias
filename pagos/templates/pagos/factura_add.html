@@ -324,7 +324,7 @@
             if(data.id){
               porcentaje = parseFloat(data.porcentaje).toFixed(2);
               sustraendo = parseFloat(data.sustraendo).toFixed(2);
-              html_data += `<option value="${data.id}">(${porcentaje}% - ${sustraendo}) ${data.codigo} : ${data.actividad} </option>`
+              html_data += `<option value="${data.id}">${data.codigo} : (${porcentaje}% - ${sustraendo}) ${data.actividad} </option>`
             }else{
               retiva = data.retiva;
             }

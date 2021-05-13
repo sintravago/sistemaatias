@@ -79,7 +79,7 @@
                   <select class="form-control" name="tiposervicio" id="id_tiposervicio">
                       <option disabled>Selecciona una tiempresa</option>
                     {% for serv in servicios %}
-                      <option value = "{{ serv.id }}" {% if serv.id == object.tiposervicio.id %} selected {% endif %}>{{ serv.codigo }} : {{ serv.actividad }}</option>
+                      <option value = "{{ serv.id }}" {% if serv.id == object.tiposervicio.id %} selected {% endif %}>{{ serv.codigo }} : ({{ serv.porcentaje|floatformat:2 }}% - {{ serv.sustraendo|floatformat:2 }} ) {{ serv.actividad }}</option>
                     {% endfor %}
                   </select>
                 </div>
@@ -323,7 +323,7 @@
             if(data.id){
               porcentaje = parseFloat(data.porcentaje).toFixed(2);
               sustraendo = parseFloat(data.sustraendo).toFixed(2);
-              html_data += `<option value="${data.id}">(${porcentaje}% - ${sustraendo}) ${data.codigo} : ${data.actividad} </option>`
+              html_data += `<option value="${data.id}"> ${data.codigo} : (${porcentaje}% - ${sustraendo}) ${data.actividad} </option>`
             }else{
               retiva = data.retiva;
             }
