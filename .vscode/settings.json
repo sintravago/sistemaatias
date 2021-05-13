@@ -6,6 +6,6 @@
         "--load-plugins",
         "pylint_django",
     ],
-    "python.pythonPath": "C:\\Users\\Victor\\.conda\\envs\\desarrollo\\python.exe",
+    "python.pythonPath": "C:\\Users\\dmogollon\\.conda\\envs\\desarrollo\\python.exe",
 
 }

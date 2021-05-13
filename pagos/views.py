@@ -412,7 +412,7 @@ def get_servicio_ajax(request):
         except Exception:
             data['error_message'] = 'error'
             return JsonResponse(data)
-        result = list(servicio.values('id', 'codigo', 'actividad'))
+        result = list(servicio.values('id', 'codigo', 'actividad', 'porcentaje', 'sustraendo'))
         result.append({'retiva':emp.retiva})
         return JsonResponse(result, safe = False)
 
